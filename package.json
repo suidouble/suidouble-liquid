@@ -1,0 +1,15 @@
+{
+  "name": "liquid",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "tap -j=1 ./test/*.test.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "suidouble": "^0.0.43",
+    "tap": "^16.3.4"
+  }
+}
