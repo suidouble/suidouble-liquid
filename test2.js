@@ -18,8 +18,8 @@ const strategies = {
 
 const run = async()=>{
     const epochDuration = 10000;
-    const strategyId = 0;
-    const waitTillEpoch = 5; // do not trade on first N epoch, as we can start on different one
+    const strategyId = 1;
+    const waitTillEpoch = 1;// 5; // do not trade on first N epoch, as we can start on different one
     const simulateNEpochs = 100;
 
     await SuiLocalTestValidator.launch({
@@ -29,7 +29,7 @@ const run = async()=>{
 
     const ld = new LiquidDouble({
         packageId: '',
-        debug: false,
+        debug: true,
     });
     await ld.initialize();
     // await ld.getCurrentEpoch();

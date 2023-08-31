@@ -40,174 +40,174 @@ module suidouble_liquid::suidouble_liquid_coin {
         coin::burn(treasury, coin);
     }
 
-    const PRICE_K: u64 = 1_000_000_000; // 1 SUI
+    // const PRICE_K: u64 = 1_000_000_000; // 1 SUI
 
-    public(friend) fun sui_to_token(amount: u64, price_reverse: u64): u64 {
-        let token_amount = ( (amount as u128) * (price_reverse as u128) ) / ( PRICE_K as u128 );
+    // public(friend) fun sui_to_token(amount: u64, price_reverse: u64): u64 {
+    //     let token_amount = ( (amount as u128) * (price_reverse as u128) ) / ( PRICE_K as u128 );
 
-        (token_amount as u64)
-    }
+    //     (token_amount as u64)
+    // }
 
-    public(friend) fun token_to_sui(amount: u64, price: u64): u64 {
-        let sui_amount = ( (amount as u128) * (price as u128) ) / ( PRICE_K as u128 );
+    // public(friend) fun token_to_sui(amount: u64, price: u64): u64 {
+    //     let sui_amount = ( (amount as u128) * (price as u128) ) / ( PRICE_K as u128 );
 
-        (sui_amount as u64)
-    }
+    //     (sui_amount as u64)
+    // }
 
-    public(friend) fun get_current_price_reverse2(pending_balance: u64, promised_amount: u64, token_total_supply: u64, staked_ref: &vector<staking_pool::StakedSui>, state: &mut SuiSystemState, ctx: &mut TxContext): u64 {
-        // let total_in = staked_balance + pending_balance;
+    // public(friend) fun get_current_price_reverse2(pending_balance: u64, promised_amount: u64, token_total_supply: u64, staked_ref: &vector<staking_pool::StakedSui>, state: &mut SuiSystemState, ctx: &mut TxContext): u64 {
+    //     // let total_in = staked_balance + pending_balance;
         
 
-        let currently_staked_with_rewards = expected_staked_balance(staked_ref, state, ctx);
-        let total_in = pending_balance + currently_staked_with_rewards - promised_amount;
+    //     let currently_staked_with_rewards = expected_staked_balance(staked_ref, state, ctx);
+    //     let total_in = pending_balance + currently_staked_with_rewards - promised_amount;
 
-        if (total_in == 0) {
-            return (PRICE_K)
-        };
-        // let total_out = currently_staked_with_rewards + pending_balance;
+    //     if (total_in == 0) {
+    //         return (PRICE_K)
+    //     };
+    //     // let total_out = currently_staked_with_rewards + pending_balance;
 
-        let price_for_1_sui = ( (token_total_supply as u128) * (PRICE_K as u128) ) / (total_in as u128);
-        // let price_for_1_sui_as_u64 = price_for_1_sui as u64;
+    //     let price_for_1_sui = ( (token_total_supply as u128) * (PRICE_K as u128) ) / (total_in as u128);
+    //     // let price_for_1_sui_as_u64 = price_for_1_sui as u64;
 
-        (price_for_1_sui as u64)
-    }
+    //     (price_for_1_sui as u64)
+    // }
 
-    public(friend) fun get_current_price_reverse(staked_balance: u64, pending_balance: u64, staked_ref: &vector<staking_pool::StakedSui>, state: &mut SuiSystemState, ctx: &mut TxContext): u64 {
-        let total_in = staked_balance + pending_balance;
+    // public(friend) fun get_current_price_reverse(staked_balance: u64, pending_balance: u64, staked_ref: &vector<staking_pool::StakedSui>, state: &mut SuiSystemState, ctx: &mut TxContext): u64 {
+    //     let total_in = staked_balance + pending_balance;
 
-        let currently_staked_with_rewards = expected_staked_balance(staked_ref, state, ctx);
-        let total_out = currently_staked_with_rewards + pending_balance;
+    //     let currently_staked_with_rewards = expected_staked_balance(staked_ref, state, ctx);
+    //     let total_out = currently_staked_with_rewards + pending_balance;
 
-        if (total_out == 0) {
-            return (PRICE_K)
-        };
+    //     if (total_out == 0) {
+    //         return (PRICE_K)
+    //     };
 
-        let price_for_1_sui = ( (total_in as u128) * (PRICE_K as u128) ) / (total_out as u128);
-        // let price_for_1_sui_as_u64 = price_for_1_sui as u64;
+    //     let price_for_1_sui = ( (total_in as u128) * (PRICE_K as u128) ) / (total_out as u128);
+    //     // let price_for_1_sui_as_u64 = price_for_1_sui as u64;
 
-        (price_for_1_sui as u64)
-    }
+    //     (price_for_1_sui as u64)
+    // }
 
-    public(friend) fun get_current_price2(pending_balance: u64, promised_amount: u64, token_total_supply: u64, staked_ref: &vector<staking_pool::StakedSui>, state: &mut SuiSystemState, ctx: &mut TxContext): u64 {
-        // let total_in = staked_balance + pending_balance;
+    // public(friend) fun get_current_price2(pending_balance: u64, promised_amount: u64, token_total_supply: u64, staked_ref: &vector<staking_pool::StakedSui>, state: &mut SuiSystemState, ctx: &mut TxContext): u64 {
+    //     // let total_in = staked_balance + pending_balance;
         
-        if (token_total_supply == 0) {
-            return (PRICE_K)
-        };
+    //     if (token_total_supply == 0) {
+    //         return (PRICE_K)
+    //     };
 
-        let currently_staked_with_rewards = expected_staked_balance(staked_ref, state, ctx);
-        let total_in = pending_balance + currently_staked_with_rewards - promised_amount;
-        // let total_out = currently_staked_with_rewards + pending_balance;
+    //     let currently_staked_with_rewards = expected_staked_balance(staked_ref, state, ctx);
+    //     let total_in = pending_balance + currently_staked_with_rewards - promised_amount;
+    //     // let total_out = currently_staked_with_rewards + pending_balance;
 
-        let price_for_1_sui = ( (total_in as u128) * (PRICE_K as u128) ) / (token_total_supply as u128);
-        // let price_for_1_sui_as_u64 = price_for_1_sui as u64;
+    //     let price_for_1_sui = ( (total_in as u128) * (PRICE_K as u128) ) / (token_total_supply as u128);
+    //     // let price_for_1_sui_as_u64 = price_for_1_sui as u64;
 
-        (price_for_1_sui as u64)
-    }
+    //     (price_for_1_sui as u64)
+    // }
 
-    public(friend) fun get_current_price(staked_balance: u64, pending_balance: u64, staked_ref: &vector<staking_pool::StakedSui>, state: &mut SuiSystemState, ctx: &mut TxContext): u64 {
-        let total_in = staked_balance + pending_balance;
+    // public(friend) fun get_current_price(staked_balance: u64, pending_balance: u64, staked_ref: &vector<staking_pool::StakedSui>, state: &mut SuiSystemState, ctx: &mut TxContext): u64 {
+    //     let total_in = staked_balance + pending_balance;
         
-        if (total_in == 0) {
-            return (PRICE_K)
-        };
+    //     if (total_in == 0) {
+    //         return (PRICE_K)
+    //     };
 
-        let currently_staked_with_rewards = expected_staked_balance(staked_ref, state, ctx);
-        let total_out = currently_staked_with_rewards + pending_balance;
+    //     let currently_staked_with_rewards = expected_staked_balance(staked_ref, state, ctx);
+    //     let total_out = currently_staked_with_rewards + pending_balance;
 
-        let price_for_1_sui = ( (total_out as u128) * (PRICE_K as u128) ) / (total_in as u128);
-        // let price_for_1_sui_as_u64 = price_for_1_sui as u64;
+    //     let price_for_1_sui = ( (total_out as u128) * (PRICE_K as u128) ) / (total_in as u128);
+    //     // let price_for_1_sui_as_u64 = price_for_1_sui as u64;
 
-        (price_for_1_sui as u64)
-    }
+    //     (price_for_1_sui as u64)
+    // }
 
-    // logic taken from test function of staking_pool module
-    public(friend) fun expected_staked_balance(staked_ref: &vector<staking_pool::StakedSui>, state: &mut SuiSystemState, ctx: &mut TxContext): u64 {
-        let n = vector::length(staked_ref);
-        let i = 0;
+    // // logic taken from test function of staking_pool module
+    // public(friend) fun expected_staked_balance(staked_ref: &vector<staking_pool::StakedSui>, state: &mut SuiSystemState, ctx: &mut TxContext): u64 {
+    //     let n = vector::length(staked_ref);
+    //     let i = 0;
 
-        let current_epoch = tx_context::epoch(ctx);
+    //     let current_epoch = tx_context::epoch(ctx);
 
-        let expected_amount:u64 = 0;
+    //     let expected_amount:u64 = 0;
 
-        while (i < n) {
-            let ref = vector::borrow(staked_ref, i);
-            let pool = staking_pool::pool_id(ref);
+    //     while (i < n) {
+    //         let ref = vector::borrow(staked_ref, i);
+    //         let pool = staking_pool::pool_id(ref);
 
-            let staked_amount = staking_pool::staked_sui_amount(ref);
-            let staked_activation_epoch = staking_pool::stake_activation_epoch(ref);
+    //         let staked_amount = staking_pool::staked_sui_amount(ref);
+    //         let staked_activation_epoch = staking_pool::stake_activation_epoch(ref);
 
-            if (staked_activation_epoch >= current_epoch) {
-                // no profits yet
-                expected_amount = expected_amount + staked_amount;
-            } else {
-                let exchange_rates = pool_exchange_rates(state, &pool); // sui_system::sui_system::pool_exchange_rates
+    //         if (staked_activation_epoch >= current_epoch) {
+    //             // no profits yet
+    //             expected_amount = expected_amount + staked_amount;
+    //         } else {
+    //             let exchange_rates = pool_exchange_rates(state, &pool); // sui_system::sui_system::pool_exchange_rates
 
-                let exchange_rate_at_staking_epoch = staking_pool_echange_rate_at_epoch(exchange_rates, staked_activation_epoch);
-                let new_epoch_exchange_rate = staking_pool_echange_rate_at_epoch(exchange_rates, current_epoch);
+    //             let exchange_rate_at_staking_epoch = staking_pool_echange_rate_at_epoch(exchange_rates, staked_activation_epoch);
+    //             let new_epoch_exchange_rate = staking_pool_echange_rate_at_epoch(exchange_rates, current_epoch);
 
-                let pool_token_withdraw_amount = get_token_amount(&exchange_rate_at_staking_epoch, staked_amount);
-                let total_sui_withdraw_amount = get_sui_amount(&new_epoch_exchange_rate, pool_token_withdraw_amount);
+    //             let pool_token_withdraw_amount = get_token_amount(&exchange_rate_at_staking_epoch, staked_amount);
+    //             let total_sui_withdraw_amount = get_sui_amount(&new_epoch_exchange_rate, pool_token_withdraw_amount);
 
-                // let rewards = total_sui_withdraw_amount - staked_amount;
+    //             // let rewards = total_sui_withdraw_amount - staked_amount;
 
-                expected_amount = expected_amount + total_sui_withdraw_amount;
-            };
+    //             expected_amount = expected_amount + total_sui_withdraw_amount;
+    //         };
 
-            i = i + 1;
-        };
+    //         i = i + 1;
+    //     };
 
-        expected_amount
-    }
+    //     expected_amount
+    // }
 
-    // functions from staking_pool, we don't have direct access to, so have to include with little refactoring
-    fun staking_pool_echange_rate_at_epoch(rates: &Table<u64, staking_pool::PoolTokenExchangeRate>, epoch: u64): staking_pool::PoolTokenExchangeRate {
-        let look_up_epoch = epoch + 0;
-        let pool_activation_epoch = 1; // ??? todo: find somehow
+    // // functions from staking_pool, we don't have direct access to, so have to include with little refactoring
+    // fun staking_pool_echange_rate_at_epoch(rates: &Table<u64, staking_pool::PoolTokenExchangeRate>, epoch: u64): staking_pool::PoolTokenExchangeRate {
+    //     let look_up_epoch = epoch + 0;
+    //     let pool_activation_epoch = 1; // ??? todo: find somehow
 
-        // Find the latest epoch that's earlier than the given epoch with an entry in the table
-        while (look_up_epoch >= pool_activation_epoch) {
-            if (table::contains(rates, look_up_epoch)) {
-                return *table::borrow(rates, look_up_epoch)
-            };
-            look_up_epoch = look_up_epoch - 1;
-        };
+    //     // Find the latest epoch that's earlier than the given epoch with an entry in the table
+    //     while (look_up_epoch >= pool_activation_epoch) {
+    //         if (table::contains(rates, look_up_epoch)) {
+    //             return *table::borrow(rates, look_up_epoch)
+    //         };
+    //         look_up_epoch = look_up_epoch - 1;
+    //     };
 
-        // we don't have to be here
-        return *table::borrow(rates, 0)
-    }
+    //     // we don't have to be here
+    //     return *table::borrow(rates, 0)
+    // }
 
-    // functions from staking_pool, we don't have direct access to, so have to include with little refactoring
-    fun get_sui_amount(exchange_rate: &staking_pool::PoolTokenExchangeRate, token_amount: u64): u64 {
-        let exchange_rate_sui_amount = staking_pool::sui_amount(exchange_rate);
-        let exchange_rate_pool_token_amount = staking_pool::pool_token_amount(exchange_rate);
+    // // functions from staking_pool, we don't have direct access to, so have to include with little refactoring
+    // fun get_sui_amount(exchange_rate: &staking_pool::PoolTokenExchangeRate, token_amount: u64): u64 {
+    //     let exchange_rate_sui_amount = staking_pool::sui_amount(exchange_rate);
+    //     let exchange_rate_pool_token_amount = staking_pool::pool_token_amount(exchange_rate);
 
-        // When either amount is 0, that means we have no stakes with this pool.
-        // The other amount might be non-zero when there's dust left in the pool.
-        if (exchange_rate_sui_amount == 0 || exchange_rate_pool_token_amount == 0) {
-            return token_amount
-        };
-        let res = (exchange_rate_sui_amount as u128)
-                * (token_amount as u128)
-                / (exchange_rate_pool_token_amount as u128);
-        (res as u64)
-    }
+    //     // When either amount is 0, that means we have no stakes with this pool.
+    //     // The other amount might be non-zero when there's dust left in the pool.
+    //     if (exchange_rate_sui_amount == 0 || exchange_rate_pool_token_amount == 0) {
+    //         return token_amount
+    //     };
+    //     let res = (exchange_rate_sui_amount as u128)
+    //             * (token_amount as u128)
+    //             / (exchange_rate_pool_token_amount as u128);
+    //     (res as u64)
+    // }
 
-    // functions from staking_pool, we don't have direct access to, so have to include with little refactoring
-    fun get_token_amount(exchange_rate: &staking_pool::PoolTokenExchangeRate, sui_amount: u64): u64 {
-        let exchange_rate_sui_amount = staking_pool::sui_amount(exchange_rate);
-        let exchange_rate_pool_token_amount = staking_pool::pool_token_amount(exchange_rate);
+    // // functions from staking_pool, we don't have direct access to, so have to include with little refactoring
+    // fun get_token_amount(exchange_rate: &staking_pool::PoolTokenExchangeRate, sui_amount: u64): u64 {
+    //     let exchange_rate_sui_amount = staking_pool::sui_amount(exchange_rate);
+    //     let exchange_rate_pool_token_amount = staking_pool::pool_token_amount(exchange_rate);
 
-        // When either amount is 0, that means we have no stakes with this pool.
-        // The other amount might be non-zero when there's dust left in the pool.
-        if (exchange_rate_sui_amount == 0 || exchange_rate_pool_token_amount == 0) {
-            return sui_amount
-        };
-        let res = (exchange_rate_pool_token_amount as u128)
-                * (sui_amount as u128)
-                / (exchange_rate_sui_amount as u128);
-        (res as u64)
-    }
+    //     // When either amount is 0, that means we have no stakes with this pool.
+    //     // The other amount might be non-zero when there's dust left in the pool.
+    //     if (exchange_rate_sui_amount == 0 || exchange_rate_pool_token_amount == 0) {
+    //         return sui_amount
+    //     };
+    //     let res = (exchange_rate_pool_token_amount as u128)
+    //             * (sui_amount as u128)
+    //             / (exchange_rate_sui_amount as u128);
+    //     (res as u64)
+    // }
     // /// For when someone tries to send a non OTW struct
     // const ENotOneTimeWitness: u64 = 0;
 

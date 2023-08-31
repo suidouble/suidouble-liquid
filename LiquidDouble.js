@@ -353,8 +353,8 @@ class LiquidDouble {
             staked_sui_activated_count: 0,
             staked_sui_pools_count: 0,
             token_total_supply: BigInt(0),
-            pending: BigInt(0),                     // pending SUI, not-staked yet
-            staked_balance: BigInt(0),              // staked as StakedSui, not counting rewards
+            pending_amount: BigInt(0),                     // pending SUI, not-staked yet
+            staked_amount: BigInt(0),              // staked as StakedSui, not counting rewards
             staked_with_rewards_balance: BigInt(0), // calculated once per epoch amount of Sui in StakedSui + Rewards
             promised_amount: BigInt(0),             // promised as withdraw, but not un-staked yet, not ready for pay-out
             promised_fulfilled: BigInt(0),                    // fulfiled promises balance, ready for pay-out
@@ -365,26 +365,27 @@ class LiquidDouble {
         const liquidStore = this._suiMaster.objectStorage.findMostRecentByTypeName('LiquidStore');
         await liquidStore.fetchFields(); // update fields to most recent
 
-        // console.log(liquidStore.fields);
         // console.log(liquidStore.fields.treasury.fields.total_supply.fields.value);
 
         ret.token_total_supply = BigInt(liquidStore.fields.treasury.fields.total_supply.fields.value);
 
-        ret.pending = BigInt(liquidStore.fields.pending);
-        ret.staked_balance = BigInt(liquidStore.fields.staked_balance);
+        ret.pending_amount = BigInt(liquidStore.fields.pending_pool);
+
+        ret.staked_amount = BigInt(liquidStore.fields.staked_pool.fields.staked_amount);
+
         ret.promised_amount = BigInt(liquidStore.fields.promised_amount);
         ret.promised_fulfilled = BigInt(liquidStore.fields.promised);
         ret.staked_with_rewards_balance = BigInt(liquidStore.fields.staked_with_rewards_balance);
 
-        ret.price_calculated = Number(ret.pending + ret.staked_with_rewards_balance - ret.promised_amount) / Number(ret.token_total_supply);
+        ret.price_calculated = Number(ret.pending_amount + ret.staked_with_rewards_balance - ret.promised_amount) / Number(ret.token_total_supply);
 
         ret.epoch = BigInt(liquidStore.fields.liquid_store_epoch);
 
-        ret.staked_sui_count = liquidStore.fields.staked.length;
-
-        if (liquidStore.fields.staked.length) {
+        if (liquidStore.fields.staked_pool.fields.staked_pool.length) {
             const pool_ids = [];
-            liquidStore.fields.staked.forEach((item)=>{
+            liquidStore.fields.staked_pool.fields.staked_pool.forEach((item)=>{
+                ret.staked_sui_count++;
+
                 const pool_id = item.fields.pool_id;
                 const stake_activation_epoch = BigInt(item.fields.stake_activation_epoch);
 
