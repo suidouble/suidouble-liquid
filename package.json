@@ -29,7 +29,7 @@
     "mongoose": "^6.0.12",
     "node-fetch": "^2.6.7",
     "nodemailer": "^6.7.5",
-    "suidouble": "^0.0.38",
+    "suidouble": "^0.0.43",
     "vue-sui": "^0.0.38",
     "winston": "^2.3.1"
   },

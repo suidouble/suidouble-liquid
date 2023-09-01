@@ -11,21 +11,23 @@ const strategies = {
         }
     },
     strategy1: async(ld, curStep)=>{
-        if (curStep) {
+        if (!curStep) {
+            // start with a single deposit of 100 SUI
             await ld.deposit({amount: '100.0'});
         }
 
+        // Add 1 SUI each step and withdraw 1% of your pool tokens
         await ld.deposit({amount: '1.0'});
-        await ld.withdraw({amount: '50%'});
-        await ld.fulfill();
+        await ld.withdraw({amount: '1%'});
+        // await ld.fulfill();
     },
 };
 
 const run = async()=>{
-    const epochDuration = 5000;
+    const epochDuration = 8000;
     const strategyId = 1;
-    const waitTillEpoch = 3;// 5; // do not trade on first N epoch, as we can start on different one
-    const simulateNEpochs = 100;
+    const waitTillEpoch = 5;// 5; // do not trade on first N epoch, as we can start on different one
+    const simulateNEpochs = 5;
 
     await SuiLocalTestValidator.launch({
         debug: true,
@@ -58,6 +60,32 @@ const run = async()=>{
         const stats = await ld.getCurrentStatsAndWaitForTheNextEpoch();
         console.log(stats);
     }
+
+    // on the last step, it should let you swap all your tokens and fulfill the promise
+    await ld.withdraw({amount: '99.999%'});
+
+    // wait for 3 epochs
+    await new Promise((res)=>setTimeout(res, 1000));
+    await ld.once_per_epoch();
+    await ld.getCurrentStatsAndWaitForTheNextEpoch();
+    await new Promise((res)=>setTimeout(res, 1000));
+    await ld.once_per_epoch();
+    await ld.getCurrentStatsAndWaitForTheNextEpoch();
+    await new Promise((res)=>setTimeout(res, 1000));
+    await ld.once_per_epoch();
+    await ld.getCurrentStatsAndWaitForTheNextEpoch();
+
+    let fulfiled = false;
+    do {
+        // fulfill all the promises user have
+        fulfiled = await ld.fulfill();
+        await new Promise((res)=>setTimeout(res, 300));
+    } while(fulfiled);
+
+    await ld.once_per_epoch();
+    await ld.getCurrentStatsAndWaitForTheNextEpoch();
+
+    // await new Promise((res)=>setTimeout(res, 60000000));
 
     const csv = ld.getCachedEpochStats(true);
     const filename = './simulations/'+ ((new Date()).getTime()) + '_strategy_'+strategyId+'.csv';

@@ -2,7 +2,7 @@
 module suidouble_liquid::suidouble_liquid {
     const VERSION: u64 = 1;
 
-    const WithdrawPromiseCooldownEpochs: u64 = 1;
+    const WithdrawPromiseCooldownEpochs: u64 = 3;
     const MIN_STAKING_THRESHOLD: u64 = 1_000_000_000; // 1 SUI, value we use to stake to StakedSui, our users can stake any amount to our pool
 
     const EWithdrawingTooMuch: u64 = 1;
@@ -21,8 +21,8 @@ module suidouble_liquid::suidouble_liquid {
     // use sui::table::{Self, Table};
     use sui::transfer;
     use sui_system::sui_system::SuiSystemState;
-    use sui_system::sui_system::request_add_stake_non_entry;
-    use sui_system::sui_system::request_withdraw_stake_non_entry;
+    // use sui_system::sui_system::request_add_stake_non_entry;
+    // use sui_system::sui_system::request_withdraw_stake_non_entry;
     // use sui_system::sui_system::pool_exchange_rates;
 
     use sui::package;
@@ -32,14 +32,14 @@ module suidouble_liquid::suidouble_liquid {
 
     use sui::object::{Self, UID, ID};
 
-    use sui_system::staking_pool::{Self, StakedSui};
+    // use sui_system::staking_pool::{Self, StakedSui};
     // use sui_system::staking_pool::stake_activation_epoch;
     // use sui_system::staking_pool::staked_sui_amount;
-    use std::vector;
+    // use std::vector;
     // use sui::display;
 
     // use sui::coin;
-    use sui::math;
+    // use sui::math;
 
     use std::option::{Self, Option, none};
 
@@ -64,6 +64,9 @@ module suidouble_liquid::suidouble_liquid {
         treasury: Option<coin::TreasuryCap<suidouble_liquid_coin::SUIDOUBLE_LIQUID_COIN>>,
         staked_pool: suidouble_liquid_staker::SuidoubleLiquidStaker,
         promised_pool: suidouble_liquid_promised_pool::SuidoubleLiquidPromisedPool,
+
+        immutable_pool_sui: Balance<SUI>,
+        immutable_pool_tokens: Balance<suidouble_liquid_coin::SUIDOUBLE_LIQUID_COIN>,
         // balance: Balance<StakedSui>
     }
 
@@ -130,8 +133,11 @@ module suidouble_liquid::suidouble_liquid {
             liquid_store_epoch: 0,
             treasury: none(),
             staked_pool: suidouble_liquid_staker::default(),
-            promised_pool: suidouble_liquid_promised_pool::default(),
+            promised_pool: suidouble_liquid_promised_pool::default(ctx),
             version: VERSION,
+
+            immutable_pool_sui: balance::zero<SUI>(),
+            immutable_pool_tokens: balance::zero<suidouble_liquid_coin::SUIDOUBLE_LIQUID_COIN>(),
         };
 
         event::emit(NewLiquidStoreEvent {
@@ -144,7 +150,15 @@ module suidouble_liquid::suidouble_liquid {
 
     // this function should be called right after the package deploy, attaching TreasuryCap to the LiquidStore
     // most other functions would not work if Treasury is not set
-    public entry fun attach_treasury(liquid_store: &mut LiquidStore, treasury: coin::TreasuryCap<suidouble_liquid_coin::SUIDOUBLE_LIQUID_COIN>, _ctx: &mut TxContext) {
+    public entry fun attach_treasury(liquid_store: &mut LiquidStore, treasury: coin::TreasuryCap<suidouble_liquid_coin::SUIDOUBLE_LIQUID_COIN>, sui: Coin<SUI>, ctx: &mut TxContext) {
+        // filling immutable_pool, note. It's Immutable: you'll never able to withdraw this SUI or tokens, it's for stabilization of the price.
+        let amount = coin::value(&sui);
+        coin::put(&mut liquid_store.immutable_pool_sui, sui);
+
+        // mint tokens as 1:1 on the deposit to the immutable pool
+        let tokens = suidouble_liquid_coin::mint_and_return(&mut treasury, amount, ctx);
+        coin::put(&mut liquid_store.immutable_pool_tokens, tokens);
+
         // can be called only once? @todo: check
         option::fill(&mut liquid_store.treasury, treasury);
     }
@@ -169,12 +183,12 @@ module suidouble_liquid::suidouble_liquid {
             return (PRICE_K)
         };
 
-        // let pending_balance_amount = liquid_store.pending_balance;
-        let pending_amount = pending_amount(liquid_store);//liquid_store.pending_balance;
+        let immutable_amount = immutable_amount(liquid_store);
+        let pending_amount = pending_amount(liquid_store);
         let promised_amount = promised_amount(liquid_store);
         let currently_staked_with_rewards = staked_amount_with_rewards(liquid_store, state, ctx);
 
-        let total_in = pending_amount + currently_staked_with_rewards - promised_amount;
+        let total_in = immutable_amount + pending_amount + currently_staked_with_rewards - promised_amount;
 
         let price = ( (total_in as u128) * (PRICE_K as u128) ) / (total_supply as u128);
 
@@ -185,11 +199,12 @@ module suidouble_liquid::suidouble_liquid {
     *  amount of mTokens you can get for 1_000_000_000 mSUI
     */
     fun get_current_price_reverse(liquid_store: &LiquidStore, state: &mut SuiSystemState, ctx: &mut TxContext):u64 {
-        let pending_amount = pending_amount(liquid_store);//liquid_store.pending_balance;
+        let immutable_amount = immutable_amount(liquid_store);
+        let pending_amount = pending_amount(liquid_store);
         let promised_amount = promised_amount(liquid_store);
         let currently_staked_with_rewards = staked_amount_with_rewards(liquid_store, state, ctx);
 
-        let total_in = pending_amount + currently_staked_with_rewards - promised_amount;
+        let total_in = immutable_amount + pending_amount + currently_staked_with_rewards - promised_amount;
 
         if (total_in == 0) {
             return (PRICE_K)
@@ -200,6 +215,14 @@ module suidouble_liquid::suidouble_liquid {
         let price = ( (total_supply as u128) * (PRICE_K as u128) ) / (total_in as u128);
 
         (price as u64)
+    }
+
+    /**
+    * amount of mSUI in immutable pool
+    */
+    public(friend) fun immutable_amount(liquid_store: &LiquidStore): u64 {
+        // suidouble_liquid_staker::staked_amount(&liquid_store.staked_pool)
+        balance::value(&liquid_store.immutable_pool_sui)
     }
 
     /**
@@ -234,6 +257,12 @@ module suidouble_liquid::suidouble_liquid {
         suidouble_liquid_promised_pool::promised_amount(&liquid_store.promised_pool)
     }
 
+    /**
+    * currently promised mSUI amount (not yet fulfilled) for the specific epoch
+    */
+    public(friend) fun promised_amount_till_epoch(liquid_store: &LiquidStore, epoch: u64): u64 { 
+        suidouble_liquid_promised_pool::promised_amount_till_epoch(&liquid_store.promised_pool, epoch)
+    }
 
     // public(friend) fun pending_balance(liquid_store: &LiquidStore): &u64 { 
     //     &liquid_store.pending_balance 
@@ -299,7 +328,7 @@ module suidouble_liquid::suidouble_liquid {
             fulfilled_at_epoch: fulfilled_at_epoch,
         };   
 
-        suidouble_liquid_promised_pool::increment_promised_amount(&mut liquid_store.promised_pool, (sui_amount as u64));
+        suidouble_liquid_promised_pool::increment_promised_amount(&mut liquid_store.promised_pool, (sui_amount as u64), fulfilled_at_epoch);
 
         // liquid_store.promised_amount = liquid_store.promised_amount + (sui_amount as u64);
         transfer::public_transfer(liquid_withdraw_promise, tx_context::sender(ctx));
@@ -389,8 +418,9 @@ module suidouble_liquid::suidouble_liquid {
         }
     }
 
-    fun send_pending_to_promised(liquid_store: &mut LiquidStore) {
-        let promised_amount = promised_amount(liquid_store);
+    fun send_pending_to_promised(liquid_store: &mut LiquidStore, ctx: &mut TxContext) {
+        let current_epoch = tx_context::epoch(ctx);
+        let promised_amount = promised_amount_till_epoch(liquid_store, current_epoch);
 
         if (promised_amount > 0) {
             let pending_amount = pending_amount(liquid_store);
@@ -418,21 +448,23 @@ module suidouble_liquid::suidouble_liquid {
     }
 
     fun unstake_promised(liquid_store: &mut LiquidStore, state: &mut SuiSystemState, ctx: &mut TxContext) {
-        let promised_amount = promised_amount(liquid_store);
+        let current_epoch = tx_context::epoch(ctx);
+        let promised_amount = promised_amount_till_epoch(liquid_store, current_epoch);
 
-        if (promised_amount(liquid_store) > 0) {
+        if (promised_amount > 0) {
             // move pending to promised?
-            if (promised_amount(liquid_store) <= pending_amount(liquid_store)) {
+            if (promised_amount <= pending_amount(liquid_store)) {
                 // we can fulfil promises without touching staked. Let's do!
-                send_pending_to_promised(liquid_store);
+                send_pending_to_promised(liquid_store, ctx);
+                promised_amount = promised_amount_till_epoch(liquid_store, current_epoch);
             };
 
 
-            let try_to_unstake_amount = promised_amount(liquid_store);
-            let unstaked_balance = suidouble_liquid_staker::unstake_sui(&mut liquid_store.staked_pool, try_to_unstake_amount, state, ctx);
+            // let try_to_unstake_amount = promised_amount(liquid_store);
+            let unstaked_balance = suidouble_liquid_staker::unstake_sui(&mut liquid_store.staked_pool, promised_amount, state, ctx);
             let unstaked_balance_amount = balance::value(&unstaked_balance);
 
-            if (unstaked_balance_amount <= promised_amount(liquid_store)) {
+            if (unstaked_balance_amount <= promised_amount) {
                 // just add it to promised balance
                 suidouble_liquid_promised_pool::fulfill_with_sui(&mut liquid_store.promised_pool, unstaked_balance);
 
@@ -441,7 +473,7 @@ module suidouble_liquid::suidouble_liquid {
                 // liquid_store.promised_amount = liquid_store.promised_amount - unstaked_balance_amount;
             } else {
                 // split it to promised and pending
-                let to_promised = balance::split(&mut unstaked_balance, promised_amount(liquid_store));
+                let to_promised = balance::split(&mut unstaked_balance, promised_amount);
                 suidouble_liquid_promised_pool::fulfill_with_sui(&mut liquid_store.promised_pool, to_promised);
                 // balance::join(&mut liquid_store.promised, to_promised);
                 // liquid_store.promised_amount = 0;
@@ -452,8 +484,8 @@ module suidouble_liquid::suidouble_liquid {
             };
 
             // still need something?
-            if (promised_amount(liquid_store) > 0) {
-                send_pending_to_promised(liquid_store);
+            if (promised_amount_till_epoch(liquid_store, current_epoch) > 0) {
+                send_pending_to_promised(liquid_store, ctx);
             };
         };
     }

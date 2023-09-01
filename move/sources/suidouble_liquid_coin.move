@@ -8,14 +8,14 @@ module suidouble_liquid::suidouble_liquid_coin {
     use sui::transfer;
     use sui::tx_context::{Self, TxContext};
 
-    use sui_system::sui_system::SuiSystemState;
+    // use sui_system::sui_system::SuiSystemState;
     // use sui::types;
 
-    use sui_system::staking_pool;
-    use sui_system::sui_system::pool_exchange_rates;
-    use sui::table::{Table, Self};
+    // use sui_system::staking_pool;
+    // use sui_system::sui_system::pool_exchange_rates;
+    // use sui::table::{Table, Self};
 
-    use std::vector;
+    // use std::vector;
 
     // /// The type identifier of coin. The coin will have a type
     // /// tag of kind: `Coin<package_object::mycoin::MYCOIN>`
@@ -34,6 +34,10 @@ module suidouble_liquid::suidouble_liquid_coin {
     public(friend) fun mint(treasury: &mut coin::TreasuryCap<SUIDOUBLE_LIQUID_COIN>, amount: u64, ctx: &mut TxContext) {
         let coin = coin::mint(treasury, amount, ctx);
         transfer::public_transfer(coin, tx_context::sender(ctx));
+    }
+
+    public(friend) fun mint_and_return(treasury: &mut coin::TreasuryCap<SUIDOUBLE_LIQUID_COIN>, amount: u64, ctx: &mut TxContext): coin::Coin<SUIDOUBLE_LIQUID_COIN> {
+        coin::mint(treasury, amount, ctx)
     }
 
     public(friend) fun burn(treasury: &mut coin::TreasuryCap<SUIDOUBLE_LIQUID_COIN>, coin: coin::Coin<SUIDOUBLE_LIQUID_COIN>) {

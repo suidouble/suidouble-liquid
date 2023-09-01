@@ -3,7 +3,7 @@ module suidouble_liquid::suidouble_liquid_staker {
     friend suidouble_liquid::suidouble_liquid;
     friend suidouble_liquid::suidouble_liquid_promised_pool;
 
-    use suidouble_liquid::suidouble_liquid_coin;
+    // use suidouble_liquid::suidouble_liquid_coin;
     const MIN_STAKING_THRESHOLD: u64 = 1_000_000_000; // 1 SUI, value we use to stake to StakedSui, our users can stake any amount to our pool
 
     use std::vector;
@@ -13,12 +13,15 @@ module suidouble_liquid::suidouble_liquid_staker {
     use sui_system::staking_pool::{Self, StakedSui};
     use sui::table::{Table, Self};
 
-    use sui::coin::{Self, Coin};
+    // use sui::coin::{Self, Coin};
+    use sui::coin;
     use sui::sui::SUI;
     use sui::balance::{Self, Balance};
 
-    use sui::object::{Self, UID, ID};
-    use sui::tx_context::{Self, sender, TxContext};
+    use sui::object;
+    // use sui::object::{Self, UID, ID};
+    // use sui::tx_context::{Self, sender, TxContext};
+    use sui::tx_context::{Self, TxContext};
 
     use sui_system::sui_system::request_add_stake_non_entry;
     use sui_system::sui_system::request_withdraw_stake_non_entry;

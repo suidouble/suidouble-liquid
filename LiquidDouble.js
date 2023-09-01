@@ -120,7 +120,7 @@ class LiquidDouble {
 
         this.log('TreasuryCap found', treasury);
 
-        const res = await this._mod.moveCall('attach_treasury', [this._liquidStoreId, treasury.id]);
+        const res = await this._mod.moveCall('attach_treasury', [this._liquidStoreId, treasury.id, {type: 'SUI', amount: '10.0'}]);
         if (res && res.status && res.status == 'success') {
             this.log('TreasuryCap attached.');
             return true;
@@ -281,6 +281,17 @@ class LiquidDouble {
     }
 
     /**
+     * Format amount BigInt to readable string representation
+     * @param {BigInt} amount 
+     * @returns 
+     */
+    async amountToString(amount) {
+        // as decimals are same for SUI and pool token:
+        const suiCoin = this._suiMaster.suiCoins.get('sui');
+        return suiCoin.amountToString(amount);
+    }
+
+    /**
      * Get amount of tokens currenty stored under connected wallet
      */
     async getCurrentTokenBalance() {
@@ -305,6 +316,8 @@ class LiquidDouble {
     }
 
     async getCurrentStatsAndWaitForTheNextEpoch() {
+        await new Promise((res)=>setTimeout(res, 500));
+
         const stats = await this.getCurrentStats();
         const waitingForEpoch = stats.epoch + BigInt(1);
 
@@ -348,6 +361,8 @@ class LiquidDouble {
      */
     async getCurrentStats() {
         const ret = {
+            immutable_pool_sui: 0,
+            immutable_pool_tokens: 0,
             price_of_last_transaction: 1,
             staked_sui_count: 0,
             staked_sui_activated_count: 0,
@@ -356,6 +371,7 @@ class LiquidDouble {
             pending_amount: BigInt(0),                     // pending SUI, not-staked yet
             staked_amount: BigInt(0),              // staked as StakedSui, not counting rewards
             staked_with_rewards_balance: BigInt(0), // calculated once per epoch amount of Sui in StakedSui + Rewards
+            all_time_promised_amount: BigInt(0),    // all time amount of SUI asked to take out of pool
             promised_amount: BigInt(0),             // promised as withdraw, but not un-staked yet, not ready for pay-out
             promised_fulfilled: BigInt(0),                    // fulfiled promises balance, ready for pay-out
         };
@@ -364,6 +380,9 @@ class LiquidDouble {
 
         const liquidStore = this._suiMaster.objectStorage.findMostRecentByTypeName('LiquidStore');
         await liquidStore.fetchFields(); // update fields to most recent
+
+        ret.immutable_pool_sui = BigInt(liquidStore.fields.immutable_pool_sui);
+        ret.immutable_pool_tokens = BigInt(liquidStore.fields.immutable_pool_tokens);
 
         console.log(liquidStore.fields.promised_pool);
 
@@ -374,11 +393,16 @@ class LiquidDouble {
         ret.staked_amount = BigInt(liquidStore.fields.staked_pool.fields.staked_amount);
 
         ret.promised_amount = BigInt(liquidStore.fields.promised_pool.fields.promised_amount);
+        ret.all_time_promised_amount = BigInt(liquidStore.fields.promised_pool.fields.all_time_promised_amount);
         ret.promised_fulfilled = BigInt(liquidStore.fields.promised_pool.fields.promised_sui);
-        
+
         ret.staked_with_rewards_balance = BigInt(liquidStore.fields.staked_with_rewards_balance);
 
-        ret.price_calculated = Number(ret.pending_amount + ret.staked_with_rewards_balance - ret.promised_amount) / Number(ret.token_total_supply);
+        if (ret.token_total_supply) {
+            ret.price_calculated = Number(ret.immutable_pool_sui + ret.pending_amount + ret.staked_with_rewards_balance - ret.promised_amount) / Number(ret.token_total_supply);
+        } else {
+            ret.price_calculated = Number(1);
+        }
 
         ret.epoch = BigInt(liquidStore.fields.liquid_store_epoch);
 
@@ -401,6 +425,14 @@ class LiquidDouble {
                 ret.staked_sui_pools_count = pool_ids.length;
             });
         }
+
+        ret.token_total_supply = await this.amountToString(ret.token_total_supply);
+        ret.pending_amount = await this.amountToString(ret.pending_amount);
+        ret.staked_amount = await this.amountToString(ret.staked_amount);
+        ret.staked_with_rewards_balance = await this.amountToString(ret.staked_with_rewards_balance);
+        ret.promised_amount = await this.amountToString(ret.promised_amount);
+        ret.all_time_promised_amount = await this.amountToString(ret.all_time_promised_amount);
+        ret.promised_fulfilled = await this.amountToString(ret.promised_fulfilled);
 
         this._epochStats[ret.epoch] = ret;
 
