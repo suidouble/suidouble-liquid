@@ -11,15 +11,20 @@ const strategies = {
         }
     },
     strategy1: async(ld, curStep)=>{
+        if (curStep) {
+            await ld.deposit({amount: '100.0'});
+        }
+
         await ld.deposit({amount: '1.0'});
         await ld.withdraw({amount: '50%'});
+        await ld.fulfill();
     },
 };
 
 const run = async()=>{
-    const epochDuration = 10000;
+    const epochDuration = 5000;
     const strategyId = 1;
-    const waitTillEpoch = 1;// 5; // do not trade on first N epoch, as we can start on different one
+    const waitTillEpoch = 3;// 5; // do not trade on first N epoch, as we can start on different one
     const simulateNEpochs = 100;
 
     await SuiLocalTestValidator.launch({

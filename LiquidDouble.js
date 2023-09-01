@@ -365,7 +365,7 @@ class LiquidDouble {
         const liquidStore = this._suiMaster.objectStorage.findMostRecentByTypeName('LiquidStore');
         await liquidStore.fetchFields(); // update fields to most recent
 
-        // console.log(liquidStore.fields.treasury.fields.total_supply.fields.value);
+        console.log(liquidStore.fields.promised_pool);
 
         ret.token_total_supply = BigInt(liquidStore.fields.treasury.fields.total_supply.fields.value);
 
@@ -373,8 +373,9 @@ class LiquidDouble {
 
         ret.staked_amount = BigInt(liquidStore.fields.staked_pool.fields.staked_amount);
 
-        ret.promised_amount = BigInt(liquidStore.fields.promised_amount);
-        ret.promised_fulfilled = BigInt(liquidStore.fields.promised);
+        ret.promised_amount = BigInt(liquidStore.fields.promised_pool.fields.promised_amount);
+        ret.promised_fulfilled = BigInt(liquidStore.fields.promised_pool.fields.promised_sui);
+        
         ret.staked_with_rewards_balance = BigInt(liquidStore.fields.staked_with_rewards_balance);
 
         ret.price_calculated = Number(ret.pending_amount + ret.staked_with_rewards_balance - ret.promised_amount) / Number(ret.token_total_supply);

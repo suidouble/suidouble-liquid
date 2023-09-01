@@ -1,6 +1,8 @@
 
 module suidouble_liquid::suidouble_liquid_staker {
     friend suidouble_liquid::suidouble_liquid;
+    friend suidouble_liquid::suidouble_liquid_promised_pool;
+
     use suidouble_liquid::suidouble_liquid_coin;
     const MIN_STAKING_THRESHOLD: u64 = 1_000_000_000; // 1 SUI, value we use to stake to StakedSui, our users can stake any amount to our pool
 
@@ -66,6 +68,15 @@ module suidouble_liquid::suidouble_liquid_staker {
         };
 
         value_to_stake
+    }
+
+    /**
+    *  Simple hack. Move StakedSui with the lowest APY (based on last 7 epochs) to the begining of the pool vector, so:
+    *    - we'll withdraw it first, increasing our average APY
+    *    - we don't have to check deactivated pools, as they will have the lowest APY anyway
+    */
+    public(friend) fun quick_sort_by_apy(suidouble_liquid_staker: &mut SuidoubleLiquidStaker, state: &mut SuiSystemState, ctx: &mut TxContext) {
+
     }
 
     /**
