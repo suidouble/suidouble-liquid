@@ -16,8 +16,8 @@ module.exports = async(ld, curStep) => {
             return;
         }
 
-        if (curStep >= 6) {
-            if (curStep == 6) {
+        if (curStep >= 20) {
+            if (curStep == 20) {
                 let promiseId = await ld.withdraw({amount: '100%'});
                 liquidStoreWithdrawPromiseIds.push({
                     promiseId: promiseId,
@@ -28,7 +28,7 @@ module.exports = async(ld, curStep) => {
             // Add 1 SUI each step and withdraw 1% of your pool tokens
             await ld.deposit({amount: '1.0'});
             
-            let promiseId = await ld.withdraw({amount: '2%'});
+            let promiseId = await ld.withdraw({amount: '10%'});
             liquidStoreWithdrawPromiseIds.push({
                 promiseId: promiseId,
                 step: curStep,

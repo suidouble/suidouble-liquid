@@ -28,7 +28,7 @@ const run = async()=>{
     const epochDuration = 10000;
     const strategyId = 'ExtraStaked';
     const waitTillEpoch = 3;// 5; // do not trade on first N epoch, as we can start on different one
-    const simulateNEpochs = 11;
+    const simulateNEpochs = 28;
 
     await SuiLocalTestValidator.launch({
         debug: true,

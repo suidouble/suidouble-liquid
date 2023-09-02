@@ -383,6 +383,9 @@ class LiquidDouble {
 
             promised_amount_in_staked: BigInt(0),
             extra_staked_in_promised: BigInt(0),
+            all_time_extra_amount: BigInt(0),
+
+            still_waiting_for_sui_amount: BigInt(0),
         };
 
         ret.price_of_last_transaction = await this.getCurrentPrice();
@@ -391,6 +394,8 @@ class LiquidDouble {
         await liquidStore.fetchFields(); // update fields to most recent
 
         ret.extra_staked_in_promised = BigInt(liquidStore.fields.promised_pool.fields.got_extra_staked);
+        ret.all_time_extra_amount = BigInt(liquidStore.fields.promised_pool.fields.all_time_extra_amount);
+        ret.still_waiting_for_sui_amount = BigInt(liquidStore.fields.promised_pool.fields.still_waiting_for_sui_amount);
 
         ret.immutable_pool_sui = BigInt(liquidStore.fields.immutable_pool_sui);
         ret.immutable_pool_tokens = BigInt(liquidStore.fields.immutable_pool_tokens);
@@ -445,7 +450,10 @@ class LiquidDouble {
         ret.promised_amount = await this.amountToString(ret.promised_amount);
         ret.all_time_promised_amount = await this.amountToString(ret.all_time_promised_amount);
         ret.promised_fulfilled = await this.amountToString(ret.promised_fulfilled);
+
         ret.extra_staked_in_promised = await this.amountToString(ret.extra_staked_in_promised);
+        ret.all_time_extra_amount = await this.amountToString(ret.all_time_extra_amount);
+
         ret.promised_amount_in_staked = await this.amountToString(ret.promised_amount_in_staked);
 
         ret.user_balance_sui = await this.getCurrentSUIBalance();
@@ -453,6 +461,8 @@ class LiquidDouble {
 
         ret.user_balance_tokens = await this.getCurrentTokenBalance();
         ret.user_balance_tokens = await this.amountToString(ret.user_balance_tokens);
+
+        ret.still_waiting_for_sui_amount = await this.amountToString(ret.still_waiting_for_sui_amount);
 
         Object.assign(ret, extraStatsObject);
 
