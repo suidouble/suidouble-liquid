@@ -26,6 +26,8 @@ module suidouble_liquid::suidouble_liquid_staker {
     use sui_system::sui_system::request_add_stake_non_entry;
     use sui_system::sui_system::request_withdraw_stake_non_entry;
 
+    use std::option::{Self, Option, none};
+
     struct SuidoubleLiquidStaker has store {
         staked_pool: vector<StakedSui>,
         staked_amount: u64,
@@ -71,6 +73,50 @@ module suidouble_liquid::suidouble_liquid_staker {
         };
 
         value_to_stake
+    }
+
+    public(friend) fun find_the_perfect_staked_sui(suidouble_liquid_staker: &mut SuidoubleLiquidStaker, amount: u64, state: &mut SuiSystemState, ctx: &mut TxContext): Option<StakedSui> {
+        // return option::none();
+        if (amount < MIN_STAKING_THRESHOLD) {
+            return option::none()
+        };
+
+        let n = vector::length(&suidouble_liquid_staker.staked_pool);
+        let i = 0;
+        let current_epoch = tx_context::epoch(ctx);
+
+        while (i < n) {
+            let staked_sui_ref = vector::borrow(&suidouble_liquid_staker.staked_pool, i);
+            let was_staked_amount = staking_pool::staked_sui_amount(staked_sui_ref);
+            let now = expected_staked_balance_of(staked_sui_ref, state, current_epoch);
+
+            // let pool = staking_pool::pool_id(staked_sui_ref);
+            // let staked_activation_epoch = staking_pool::stake_activation_epoch(staked_sui_ref);
+
+            // let exchange_rates = pool_exchange_rates(state, &pool); // sui_system::sui_system::pool_exchange_rates
+
+            // let exchange_rate_at_staking_epoch = staking_pool_echange_rate_at_epoch(exchange_rates, staked_activation_epoch);
+            // let new_epoch_exchange_rate = staking_pool_echange_rate_at_epoch(exchange_rates, current_epoch);
+
+            // let pool_token_amount = get_token_amount(&exchange_rate_at_staking_epoch, was_staked_amount);
+            // let now = get_sui_amount(&new_epoch_exchange_rate, pool_token_amount);
+
+            let had_to_take = (amount as u128) * (was_staked_amount as u128) / (now as u128);
+
+            if ((had_to_take as u64) < (was_staked_amount - MIN_STAKING_THRESHOLD) && (had_to_take as u64) >= MIN_STAKING_THRESHOLD) {
+                // we can take it as split
+                let staked_sui_mut = vector::borrow_mut(&mut suidouble_liquid_staker.staked_pool, i);
+                let perfect_staked_sui = staking_pool::split(staked_sui_mut, (had_to_take as u64), ctx);
+
+                suidouble_liquid_staker.staked_amount = suidouble_liquid_staker.staked_amount - (had_to_take as u64);
+
+                return option::some(perfect_staked_sui)
+            };
+
+            i = i + 1;
+        };
+
+        option::none()
     }
 
     /**
@@ -156,6 +202,27 @@ module suidouble_liquid::suidouble_liquid_staker {
         total_withdrawn_balance
     }
 
+    fun expected_staked_balance_of(staked_sui_ref: &staking_pool::StakedSui, state: &mut SuiSystemState, at_epoch: u64): u64 {
+        let staked_activation_epoch = staking_pool::stake_activation_epoch(staked_sui_ref);
+        let staked_amount = staking_pool::staked_sui_amount(staked_sui_ref);
+
+        if (staked_activation_epoch >= at_epoch) {
+            // no profits yet
+            return staked_amount
+        };
+
+        let pool = staking_pool::pool_id(staked_sui_ref);
+        let exchange_rates = pool_exchange_rates(state, &pool); // sui_system::sui_system::pool_exchange_rates
+
+        let exchange_rate_at_staking_epoch = staking_pool_echange_rate_at_epoch(exchange_rates, staked_activation_epoch);
+        let new_epoch_exchange_rate = staking_pool_echange_rate_at_epoch(exchange_rates, at_epoch);
+
+        let pool_token_withdraw_amount = get_token_amount(&exchange_rate_at_staking_epoch, staked_amount);
+        let total_sui_withdraw_amount = get_sui_amount(&new_epoch_exchange_rate, pool_token_withdraw_amount);
+
+        total_sui_withdraw_amount
+    }
+
     // logic taken from test function of staking_pool module
     public(friend) fun expected_staked_balance(staked_ref: &vector<staking_pool::StakedSui>, state: &mut SuiSystemState, at_epoch: u64): u64 {
         let n = vector::length(staked_ref);
@@ -165,27 +232,28 @@ module suidouble_liquid::suidouble_liquid_staker {
 
         while (i < n) {
             let ref = vector::borrow(staked_ref, i);
-            let pool = staking_pool::pool_id(ref);
+            expected_amount = expected_amount + expected_staked_balance_of(ref, state, at_epoch);
+            // let pool = staking_pool::pool_id(ref);
 
-            let staked_amount = staking_pool::staked_sui_amount(ref);
-            let staked_activation_epoch = staking_pool::stake_activation_epoch(ref);
+            // let staked_amount = staking_pool::staked_sui_amount(ref);
+            // let staked_activation_epoch = staking_pool::stake_activation_epoch(ref);
 
-            if (staked_activation_epoch >= at_epoch) {
-                // no profits yet
-                expected_amount = expected_amount + staked_amount;
-            } else {
-                let exchange_rates = pool_exchange_rates(state, &pool); // sui_system::sui_system::pool_exchange_rates
+            // if (staked_activation_epoch >= at_epoch) {
+            //     // no profits yet
+            //     expected_amount = expected_amount + staked_amount;
+            // } else {
+            //     let exchange_rates = pool_exchange_rates(state, &pool); // sui_system::sui_system::pool_exchange_rates
 
-                let exchange_rate_at_staking_epoch = staking_pool_echange_rate_at_epoch(exchange_rates, staked_activation_epoch);
-                let new_epoch_exchange_rate = staking_pool_echange_rate_at_epoch(exchange_rates, at_epoch);
+            //     let exchange_rate_at_staking_epoch = staking_pool_echange_rate_at_epoch(exchange_rates, staked_activation_epoch);
+            //     let new_epoch_exchange_rate = staking_pool_echange_rate_at_epoch(exchange_rates, at_epoch);
 
-                let pool_token_withdraw_amount = get_token_amount(&exchange_rate_at_staking_epoch, staked_amount);
-                let total_sui_withdraw_amount = get_sui_amount(&new_epoch_exchange_rate, pool_token_withdraw_amount);
+            //     let pool_token_withdraw_amount = get_token_amount(&exchange_rate_at_staking_epoch, staked_amount);
+            //     let total_sui_withdraw_amount = get_sui_amount(&new_epoch_exchange_rate, pool_token_withdraw_amount);
 
-                // let rewards = total_sui_withdraw_amount - staked_amount;
+            //     // let rewards = total_sui_withdraw_amount - staked_amount;
 
-                expected_amount = expected_amount + total_sui_withdraw_amount;
-            };
+            //     expected_amount = expected_amount + total_sui_withdraw_amount;
+            // };
 
             i = i + 1;
         };

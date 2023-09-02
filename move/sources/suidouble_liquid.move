@@ -326,9 +326,18 @@ module suidouble_liquid::suidouble_liquid {
             sui_amount: (sui_amount as u64),
             token_amount: token_amount,
             fulfilled_at_epoch: fulfilled_at_epoch,
-        };   
+        };
 
-        suidouble_liquid_promised_pool::increment_promised_amount(&mut liquid_store.promised_pool, (sui_amount as u64), fulfilled_at_epoch);
+        let perfect_staked_sui_option = suidouble_liquid_staker::find_the_perfect_staked_sui(&mut liquid_store.staked_pool, (sui_amount as u64), state, ctx);
+        if (option::is_some(&perfect_staked_sui_option)) {
+            // we found a perfect StakedSui for this withdraw
+            let perfect_staked_sui = option::destroy_some(perfect_staked_sui_option);
+            suidouble_liquid_promised_pool::attach_promised_staked_sui(&mut liquid_store.promised_pool, perfect_staked_sui, (sui_amount as u64), object::id(&liquid_withdraw_promise));
+        } else {
+            option::destroy_none(perfect_staked_sui_option); // just removing an none option
+
+            suidouble_liquid_promised_pool::increment_promised_amount(&mut liquid_store.promised_pool, (sui_amount as u64), fulfilled_at_epoch);
+        };
 
         // liquid_store.promised_amount = liquid_store.promised_amount + (sui_amount as u64);
         transfer::public_transfer(liquid_withdraw_promise, tx_context::sender(ctx));
@@ -349,14 +358,21 @@ module suidouble_liquid::suidouble_liquid {
 
         // let sui_amount_to_use = math::min(sui_amount_now, promise.sui_amount);
 
-        let sui_amount_to_use = promise.sui_amount;
+        if (suidouble_liquid_promised_pool::is_there_promised_staked_sui(&mut liquid_store.promised_pool, object::id(&promise))) {
+            // we have StakedSui kept for this promise
+            let coin = suidouble_liquid_promised_pool::take_promised_staked_sui(&mut liquid_store.promised_pool, object::id(&promise), state, ctx);
+            transfer::public_transfer(coin, tx_context::sender(ctx)); //  to promise.for ???
+        } else {
+            let sui_amount_to_use = promise.sui_amount;
+            let coin = suidouble_liquid_promised_pool::take_sui(&mut liquid_store.promised_pool, sui_amount_to_use, ctx);
+            transfer::public_transfer(coin, tx_context::sender(ctx)); //  to promise.for ???
+        };
 
-        let coin = suidouble_liquid_promised_pool::take_sui(&mut liquid_store.promised_pool, sui_amount_to_use, ctx);
+
 
         // assert!(sui_amount_to_use <= balance::value(&liquid_store.promised), EInvalidPromised); // we should never throw this. @todo: hard integration tests
 
         // let coin = coin::take(&mut liquid_store.promised, sui_amount_to_use, ctx);
-        transfer::public_transfer(coin, tx_context::sender(ctx)); //  to promise.for ???
 
         // and remove a promise
         let LiquidStoreWithdrawPromise { id, for: _, sui_amount: _, token_amount: _, fulfilled_at_epoch: _ } = promise;
@@ -380,6 +396,10 @@ module suidouble_liquid::suidouble_liquid {
 
             // fulfil promises first
             unstake_promised(liquid_store, state, ctx);
+
+            // take got_extra_staked from promised_pool
+            let extra_staked_balance = suidouble_liquid_promised_pool::take_extra_staked_balance(&mut liquid_store.promised_pool);
+            balance::join(&mut liquid_store.pending_pool, extra_staked_balance);
 
             // stake pending
             send_pending_to_staked(liquid_store, state, ctx);
@@ -496,6 +516,7 @@ module suidouble_liquid::suidouble_liquid {
 
         // stake pending
         send_pending_to_staked(liquid_store, state, ctx);
+
 
         let current_epoch = tx_context::epoch(ctx);
         liquid_store.liquid_store_epoch = current_epoch;

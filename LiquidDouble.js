@@ -202,38 +202,44 @@ class LiquidDouble {
      * Tries to fulfill the oldest liquid pool promise current account has
      * @returns Boolean true on success, false if there's no ready promises
      */
-    async fulfill() {
-        this.log('going to fulfill some promise');
-        const currentPromises = await this.getCurrentWithdrawPromises();
-        let min_epoch = Infinity;
-        let min_epoch_promise = null;
+    async fulfill(promiseId = null) {
+        let promiseIdToUse = promiseId;
 
-        currentPromises.forEach((promise)=>{
-            const epoch = BigInt(promise.fields.fulfilled_at_epoch);
-            if (epoch < min_epoch) {
-                min_epoch = epoch;
-                min_epoch_promise = promise;
+        if (!promiseIdToUse) {
+            this.log('going to fulfill some promise');
+            const currentPromises = await this.getCurrentWithdrawPromises();
+            let min_epoch = Infinity;
+            let min_epoch_promise = null;
+    
+            currentPromises.forEach((promise)=>{
+                const epoch = BigInt(promise.fields.fulfilled_at_epoch);
+                if (epoch < min_epoch) {
+                    min_epoch = epoch;
+                    min_epoch_promise = promise;
+                }
+            });
+    
+            if (!min_epoch_promise) {
+                this.log('there is no promises to fulfill');
+                return false; // nothing to fulfil
             }
-        });
 
-        if (!min_epoch_promise) {
-            this.log('there is no promises to fulfill');
-            return false; // nothing to fulfil
+            promiseIdToUse = min_epoch_promise.id;
         }
 
-        this.log('going to fulfill promise', min_epoch_promise.id);
+        this.log('going to fulfill promise', promiseIdToUse);
 
         try {
-            const res = await this._mod.moveCall('fulfill', [this._liquidStoreId, min_epoch_promise.id, '0x0000000000000000000000000000000000000005']);
+            const res = await this._mod.moveCall('fulfill', [this._liquidStoreId, promiseIdToUse, '0x0000000000000000000000000000000000000005']);
             if (res && res.status && res.status == 'success') {
-                this.log('promise fulfilled', min_epoch_promise.id);
+                this.log('promise fulfilled', promiseIdToUse);
                 return true;
             } 
         } catch (e) {
 
         }
 
-        this.log('promise NOT fulfilled', min_epoch_promise.id);
+        this.log('promise NOT fulfilled', promiseIdToUse);
 
         return false;
 
@@ -315,10 +321,10 @@ class LiquidDouble {
         return ret;
     }
 
-    async getCurrentStatsAndWaitForTheNextEpoch() {
+    async getCurrentStatsAndWaitForTheNextEpoch(extraStatsObject = {}) {
         await new Promise((res)=>setTimeout(res, 500));
 
-        const stats = await this.getCurrentStats();
+        const stats = await this.getCurrentStats(extraStatsObject);
         const waitingForEpoch = stats.epoch + BigInt(1);
 
         await this.waitForEpoch(waitingForEpoch);
@@ -359,7 +365,7 @@ class LiquidDouble {
     /**
      * Get current statistics of the pool
      */
-    async getCurrentStats() {
+    async getCurrentStats(extraStatsObject = {}) {
         const ret = {
             immutable_pool_sui: 0,
             immutable_pool_tokens: 0,
@@ -374,12 +380,17 @@ class LiquidDouble {
             all_time_promised_amount: BigInt(0),    // all time amount of SUI asked to take out of pool
             promised_amount: BigInt(0),             // promised as withdraw, but not un-staked yet, not ready for pay-out
             promised_fulfilled: BigInt(0),                    // fulfiled promises balance, ready for pay-out
+
+            promised_amount_in_staked: BigInt(0),
+            extra_staked_in_promised: BigInt(0),
         };
 
         ret.price_of_last_transaction = await this.getCurrentPrice();
 
         const liquidStore = this._suiMaster.objectStorage.findMostRecentByTypeName('LiquidStore');
         await liquidStore.fetchFields(); // update fields to most recent
+
+        ret.extra_staked_in_promised = BigInt(liquidStore.fields.promised_pool.fields.got_extra_staked);
 
         ret.immutable_pool_sui = BigInt(liquidStore.fields.immutable_pool_sui);
         ret.immutable_pool_tokens = BigInt(liquidStore.fields.immutable_pool_tokens);
@@ -395,6 +406,7 @@ class LiquidDouble {
         ret.promised_amount = BigInt(liquidStore.fields.promised_pool.fields.promised_amount);
         ret.all_time_promised_amount = BigInt(liquidStore.fields.promised_pool.fields.all_time_promised_amount);
         ret.promised_fulfilled = BigInt(liquidStore.fields.promised_pool.fields.promised_sui);
+        ret.promised_amount_in_staked = BigInt(liquidStore.fields.promised_pool.fields.promised_amount_in_staked);
 
         ret.staked_with_rewards_balance = BigInt(liquidStore.fields.staked_with_rewards_balance);
 
@@ -433,6 +445,16 @@ class LiquidDouble {
         ret.promised_amount = await this.amountToString(ret.promised_amount);
         ret.all_time_promised_amount = await this.amountToString(ret.all_time_promised_amount);
         ret.promised_fulfilled = await this.amountToString(ret.promised_fulfilled);
+        ret.extra_staked_in_promised = await this.amountToString(ret.extra_staked_in_promised);
+        ret.promised_amount_in_staked = await this.amountToString(ret.promised_amount_in_staked);
+
+        ret.user_balance_sui = await this.getCurrentSUIBalance();
+        ret.user_balance_sui = await this.amountToString(ret.user_balance_sui);
+
+        ret.user_balance_tokens = await this.getCurrentTokenBalance();
+        ret.user_balance_tokens = await this.amountToString(ret.user_balance_tokens);
+
+        Object.assign(ret, extraStatsObject);
 
         this._epochStats[ret.epoch] = ret;
 
@@ -466,6 +488,20 @@ class LiquidDouble {
         }
 
         return 1;
+    }
+
+    isStatsFull() {
+        const data = Object.values(this._epochStats).sort((a, b) => (a.epoch > b.epoch) ? 1 : -1);
+        if (data.length <= 1) {
+            return true;
+        }
+        for (let i = 1; i < data.length; i++) {
+            if (Number(data[i].epoch) != (Number(data[i - 1].epoch) + 1)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     getCachedEpochStats(asCSV = false) {

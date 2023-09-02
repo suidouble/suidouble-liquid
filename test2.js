@@ -10,6 +10,7 @@ const strategies = {
             await ld.once_per_epoch();
         }
     },
+    strategyExtraStaked: require('./simulations/flows/extra_rewards_on_perfect_staked_sui.js'),
     strategy1: async(ld, curStep)=>{
         if (!curStep) {
             // start with a single deposit of 100 SUI
@@ -18,16 +19,16 @@ const strategies = {
 
         // Add 1 SUI each step and withdraw 1% of your pool tokens
         await ld.deposit({amount: '1.0'});
-        await ld.withdraw({amount: '1%'});
+        await ld.withdraw({amount: '2%'});
         // await ld.fulfill();
     },
 };
 
 const run = async()=>{
-    const epochDuration = 8000;
-    const strategyId = 1;
-    const waitTillEpoch = 5;// 5; // do not trade on first N epoch, as we can start on different one
-    const simulateNEpochs = 5;
+    const epochDuration = 10000;
+    const strategyId = 'ExtraStaked';
+    const waitTillEpoch = 3;// 5; // do not trade on first N epoch, as we can start on different one
+    const simulateNEpochs = 11;
 
     await SuiLocalTestValidator.launch({
         debug: true,
@@ -61,19 +62,21 @@ const run = async()=>{
         console.log(stats);
     }
 
-    // on the last step, it should let you swap all your tokens and fulfill the promise
-    await ld.withdraw({amount: '99.999%'});
+    // // on the last step, it should let you swap all your tokens and fulfill the promise
+    // await ld.withdraw({amount: '99.999%'});
 
-    // wait for 3 epochs
-    await new Promise((res)=>setTimeout(res, 1000));
-    await ld.once_per_epoch();
-    await ld.getCurrentStatsAndWaitForTheNextEpoch();
-    await new Promise((res)=>setTimeout(res, 1000));
-    await ld.once_per_epoch();
-    await ld.getCurrentStatsAndWaitForTheNextEpoch();
-    await new Promise((res)=>setTimeout(res, 1000));
-    await ld.once_per_epoch();
-    await ld.getCurrentStatsAndWaitForTheNextEpoch();
+    // // wait for 3 epochs
+    // await new Promise((res)=>setTimeout(res, 1000));
+    // await ld.once_per_epoch();
+    // await ld.getCurrentStatsAndWaitForTheNextEpoch();
+    // await new Promise((res)=>setTimeout(res, 1000));
+    // await ld.once_per_epoch();
+    // await ld.getCurrentStatsAndWaitForTheNextEpoch();
+    // await new Promise((res)=>setTimeout(res, 1000));
+    // await ld.once_per_epoch();
+    // await ld.getCurrentStatsAndWaitForTheNextEpoch();
+
+    // await new Promise((res)=>setTimeout(res, 5000000));
 
     let fulfiled = false;
     do {
@@ -90,6 +93,10 @@ const run = async()=>{
     const csv = ld.getCachedEpochStats(true);
     const filename = './simulations/'+ ((new Date()).getTime()) + '_strategy_'+strategyId+'.csv';
     fs.writeFileSync(filename, csv);
+
+    if (!ld.isStatsFull()) {
+        console.log('WARNING: stats are not full');
+    }
 
     // await ld.deposit();
     // await ld.withdraw();
