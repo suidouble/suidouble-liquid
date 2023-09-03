@@ -2,8 +2,9 @@
 module suidouble_liquid::suidouble_liquid {
     const VERSION: u64 = 1;
 
-    const WithdrawPromiseCooldownEpochs: u64 = 3;
+    const WithdrawPromiseCooldownEpochs: u64 = 2;     // withdraw promise is ready to exchange for SUI in N epochs
     const MIN_STAKING_THRESHOLD: u64 = 1_000_000_000; // 1 SUI, value we use to stake to StakedSui, our users can stake any amount to our pool
+    const PRICE_K: u64 = 1_000_000_000; // 1 SUI, for price calculation, price values are amount you get for PRICE_K items
 
     const EWithdrawingTooMuch: u64 = 1;
     const ETooEarly: u64 = 2;
@@ -40,7 +41,7 @@ module suidouble_liquid::suidouble_liquid {
 
     // use sui::coin;
     // use sui::math;
-    use std::vector;
+    // use std::vector;
 
     use std::option::{Self, Option, none};
 
@@ -102,12 +103,14 @@ module suidouble_liquid::suidouble_liquid {
     struct WithdrawPromiseEvent has copy, drop {
         id: ID,
         price: u64,
-        token_amount: u64,
+        // token_amount: u64,
     }
 
     struct AdminCap has key {
         id: UID,
     }
+
+
 
     fun init(otw: SUIDOUBLE_LIQUID, ctx: &mut TxContext) {
         // Claim the `Publisher` for the package!
@@ -172,7 +175,6 @@ module suidouble_liquid::suidouble_liquid {
         coin::total_supply(treasury_ref)
     }
 
-    const PRICE_K: u64 = 1_000_000_000; // 1 SUI
 
     /**
     *  amount of mSUI you can get for 1_000_000_000 mTokens
@@ -441,7 +443,7 @@ module suidouble_liquid::suidouble_liquid {
         let value_to_stake = (pending_amount / MIN_STAKING_THRESHOLD) * MIN_STAKING_THRESHOLD;
 
         if (value_to_stake > 0) {
-            let staked_amount = suidouble_liquid_staker::stake_sui(&mut liquid_store.staked_pool, &mut liquid_store.pending_pool, state, ctx);
+            suidouble_liquid_staker::stake_sui(&mut liquid_store.staked_pool, &mut liquid_store.pending_pool, state, ctx);
 
             // if (staked_amount > 0) {
             //     liquid_store.pending_balance = liquid_store.pending_balance - staked_amount;
@@ -449,8 +451,8 @@ module suidouble_liquid::suidouble_liquid {
         }
     }
 
-    fun send_pending_to_promised(liquid_store: &mut LiquidStore, ctx: &mut TxContext) {
-        let current_epoch = tx_context::epoch(ctx);
+    fun send_pending_to_promised(liquid_store: &mut LiquidStore, _ctx: &mut TxContext) {
+        // let current_epoch = tx_context::epoch(ctx);
         let still_waiting_for_sui_amount = still_waiting_for_sui_amount(liquid_store);
         // let promised_amount = promised_amount_till_epoch(liquid_store, current_epoch);
 
@@ -480,7 +482,7 @@ module suidouble_liquid::suidouble_liquid {
     }
 
     fun unstake_promised(liquid_store: &mut LiquidStore, state: &mut SuiSystemState, ctx: &mut TxContext) {
-        let current_epoch = tx_context::epoch(ctx);
+        // let current_epoch = tx_context::epoch(ctx);
 
         // try to fulfill promises with StakedSui
         suidouble_liquid_promised_pool::try_to_fill_with_perfect_staked_sui(&mut liquid_store.promised_pool, &mut liquid_store.staked_pool, state, ctx);
@@ -550,7 +552,7 @@ module suidouble_liquid::suidouble_liquid {
                     // balance::join(&mut liquid_store.promised, to_promised);
                     // liquid_store.promised_amount = 0;
 
-                    let to_pending_amount = balance::value(&unstaked_balance);
+                    // let to_pending_amount = balance::value(&unstaked_balance);
                     // liquid_store.pending_balance = liquid_store.pending_balance + to_pending_amount;
                     balance::join(&mut liquid_store.pending_pool, unstaked_balance);
                 };

@@ -11,13 +11,14 @@ module suidouble_liquid::suidouble_liquid_promised_pool {
     use sui::coin::{Self, Coin};
     use sui::sui::SUI;
     use sui::balance::{Self, Balance};
-    use sui_system::staking_pool::{Self, StakedSui};
+    use sui_system::staking_pool::{StakedSui};
     use sui::tx_context::{TxContext, Self};
 
-    use sui::object::{Self, ID};
+    use sui::object::{ID};
     use sui_system::sui_system::request_withdraw_stake_non_entry;
 
-    use std::option::{Self, Option, none};
+    // use std::option::{Self, Option, none};
+    use std::option;
 
     const MIN_STAKING_THRESHOLD: u64 = 1_000_000_000; // 1 SUI, value we use to stake to StakedSui, our users can stake any amount to our pool
 
@@ -91,7 +92,7 @@ module suidouble_liquid::suidouble_liquid_promised_pool {
         
         let SuidoubleLiquidPromisedPoolStillStaked { staked_sui, expected_sui_amount, promise_id: _ } = still_staked;
         let withdrawn_balance = request_withdraw_stake_non_entry(state, staked_sui, ctx);
-        let withdrawn_amount = balance::value(&withdrawn_balance);
+        // let withdrawn_amount = balance::value(&withdrawn_balance);
 
         let coin = coin::take(&mut withdrawn_balance, expected_sui_amount, ctx);
         suidouble_liquid_promised_pool.promised_amount_in_staked = suidouble_liquid_promised_pool.promised_amount_in_staked - expected_sui_amount;

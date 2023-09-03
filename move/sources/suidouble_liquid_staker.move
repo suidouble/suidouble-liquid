@@ -26,7 +26,8 @@ module suidouble_liquid::suidouble_liquid_staker {
     use sui_system::sui_system::request_add_stake_non_entry;
     use sui_system::sui_system::request_withdraw_stake_non_entry;
 
-    use std::option::{Self, Option, none};
+    use std::option::{Self, Option};
+    // use std::option::{Self, Option, none};
 
     struct SuidoubleLiquidStaker has store {
         staked_pool: vector<StakedSui>,
@@ -87,30 +88,29 @@ module suidouble_liquid::suidouble_liquid_staker {
 
         while (i < n) {
             let staked_sui_ref = vector::borrow(&suidouble_liquid_staker.staked_pool, i);
-            let was_staked_amount = staking_pool::staked_sui_amount(staked_sui_ref);
-            let now = expected_staked_balance_of(staked_sui_ref, state, current_epoch);
+            let staked_activation_epoch = staking_pool::stake_activation_epoch(staked_sui_ref);
+            if (staked_activation_epoch <= current_epoch) {
+                // as we want perfect staked sui to be available to withdraw right away if needed
 
-            // let pool = staking_pool::pool_id(staked_sui_ref);
-            // let staked_activation_epoch = staking_pool::stake_activation_epoch(staked_sui_ref);
+                let was_staked_amount = staking_pool::staked_sui_amount(staked_sui_ref);
+                let now = expected_staked_balance_of(staked_sui_ref, state, current_epoch);
 
-            // let exchange_rates = pool_exchange_rates(state, &pool); // sui_system::sui_system::pool_exchange_rates
+                if (now >= amount) {
 
-            // let exchange_rate_at_staking_epoch = staking_pool_echange_rate_at_epoch(exchange_rates, staked_activation_epoch);
-            // let new_epoch_exchange_rate = staking_pool_echange_rate_at_epoch(exchange_rates, current_epoch);
+                    let had_to_take = (amount as u128) * (was_staked_amount as u128) / (now as u128);
 
-            // let pool_token_amount = get_token_amount(&exchange_rate_at_staking_epoch, was_staked_amount);
-            // let now = get_sui_amount(&new_epoch_exchange_rate, pool_token_amount);
+                    if ((had_to_take as u64) < (was_staked_amount - MIN_STAKING_THRESHOLD) && (had_to_take as u64) >= MIN_STAKING_THRESHOLD) {
+                        // we can take it as split
+                        let staked_sui_mut = vector::borrow_mut(&mut suidouble_liquid_staker.staked_pool, i);
+                        let perfect_staked_sui = staking_pool::split(staked_sui_mut, (had_to_take as u64), ctx);
 
-            let had_to_take = (amount as u128) * (was_staked_amount as u128) / (now as u128);
+                        suidouble_liquid_staker.staked_amount = suidouble_liquid_staker.staked_amount - (had_to_take as u64);
 
-            if ((had_to_take as u64) < (was_staked_amount - MIN_STAKING_THRESHOLD) && (had_to_take as u64) >= MIN_STAKING_THRESHOLD) {
-                // we can take it as split
-                let staked_sui_mut = vector::borrow_mut(&mut suidouble_liquid_staker.staked_pool, i);
-                let perfect_staked_sui = staking_pool::split(staked_sui_mut, (had_to_take as u64), ctx);
+                        return option::some(perfect_staked_sui)
+                    };
 
-                suidouble_liquid_staker.staked_amount = suidouble_liquid_staker.staked_amount - (had_to_take as u64);
+                };
 
-                return option::some(perfect_staked_sui)
             };
 
             i = i + 1;
@@ -124,9 +124,9 @@ module suidouble_liquid::suidouble_liquid_staker {
     *    - we'll withdraw it first, increasing our average APY
     *    - we don't have to check deactivated pools, as they will have the lowest APY anyway
     */
-    public(friend) fun quick_sort_by_apy(suidouble_liquid_staker: &mut SuidoubleLiquidStaker, state: &mut SuiSystemState, ctx: &mut TxContext) {
+    // public(friend) fun quick_sort_by_apy(suidouble_liquid_staker: &mut SuidoubleLiquidStaker, state: &mut SuiSystemState, ctx: &mut TxContext) {
 
-    }
+    // }
 
     /**
     * Unstakes SUI from the pool. Returns Balance. Note that it may unstake more than asked. It's ok and remaining should be moved to the pending pool

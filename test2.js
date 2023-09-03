@@ -11,6 +11,8 @@ const strategies = {
         }
     },
     strategyExtraStaked: require('./simulations/flows/extra_rewards_on_perfect_staked_sui.js'),
+    strategyExtraStaked2: require('./simulations/flows/extra_rewards_on_perfect_staked_sui2.js'),
+    strategyFindBadDays: require('./simulations/flows/find_bad_days_to_fix.js'),
     strategy1: async(ld, curStep)=>{
         if (!curStep) {
             // start with a single deposit of 100 SUI
@@ -26,9 +28,9 @@ const strategies = {
 
 const run = async()=>{
     const epochDuration = 10000;
-    const strategyId = 'ExtraStaked';
+    const strategyId = 'FindBadDays';
     const waitTillEpoch = 3;// 5; // do not trade on first N epoch, as we can start on different one
-    const simulateNEpochs = 28;
+    const simulateNEpochs = 10;
 
     await SuiLocalTestValidator.launch({
         debug: true,
