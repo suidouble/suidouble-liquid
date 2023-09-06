@@ -1,0 +1,1026 @@
+{
+  "title": "1693952029168_3_users(Stake5PlusUnstake10_JustAddSome_JustAddSome)_10epochs",
+  "description": "",
+  "time": 1693952029168,
+  "epochs": [
+    {
+      "immutable_pool_sui": "10000000000",
+      "immutable_pool_tokens": "10000000000",
+      "price_of_last_transaction": 1,
+      "staked_sui_count": 0,
+      "staked_sui_activated_count": 0,
+      "staked_sui_pools_count": 0,
+      "token_total_supply": "29.980000000",
+      "pending_amount": "19.980000000",
+      "staked_amount": "0.000000000",
+      "staked_staked_suis": [],
+      "staked_with_rewards_balance": "0.000000000",
+      "all_time_promised_amount": "0.000000000",
+      "promised_amount": "0.000000000",
+      "promised_fulfilled": "0.000000000",
+      "promised_amount_in_staked": "0.000000000",
+      "extra_staked_in_promised": "0.000000000",
+      "all_time_extra_amount": "0.000000000",
+      "still_waiting_for_sui_amount": "0.000000000",
+      "price_calculated": 1,
+      "epoch": "3",
+      "waitedForEpoch": "4"
+    },
+    {
+      "immutable_pool_sui": "10000000000",
+      "immutable_pool_tokens": "10000000000",
+      "price_of_last_transaction": 1,
+      "staked_sui_count": 1,
+      "staked_sui_activated_count": 0,
+      "staked_sui_pools_count": 1,
+      "token_total_supply": "77.860000000",
+      "pending_amount": "20.960000000",
+      "staked_amount": "50.000000000",
+      "staked_staked_suis": [
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "50000000000",
+          "stake_activation_epoch": "5"
+        }
+      ],
+      "staked_with_rewards_balance": "50.000000000",
+      "all_time_promised_amount": "3.100000000",
+      "promised_amount": "3.100000000",
+      "promised_fulfilled": "0.000000000",
+      "promised_amount_in_staked": "0.000000000",
+      "extra_staked_in_promised": "0.000000000",
+      "all_time_extra_amount": "0.000000000",
+      "still_waiting_for_sui_amount": "0.000000000",
+      "price_calculated": 1,
+      "epoch": "4",
+      "waitedForEpoch": "5"
+    },
+    {
+      "immutable_pool_sui": "10000000000",
+      "immutable_pool_tokens": "10000000000",
+      "price_of_last_transaction": 1,
+      "staked_sui_count": 2,
+      "staked_sui_activated_count": 1,
+      "staked_sui_pools_count": 2,
+      "token_total_supply": "99.550000000",
+      "pending_amount": "20.940000000",
+      "staked_amount": "75.000000000",
+      "staked_staked_suis": [
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "50000000000",
+          "stake_activation_epoch": "5"
+        },
+        {
+          "pool_id": "0xa6be4ba99d2d4f58c77e29df4a38cb6833d7f3c18dd349e38ae904ce48fb9e1e",
+          "principal": "25000000000",
+          "stake_activation_epoch": "6"
+        }
+      ],
+      "staked_with_rewards_balance": "75.000000000",
+      "all_time_promised_amount": "6.390000000",
+      "promised_amount": "6.390000000",
+      "promised_fulfilled": "0.000000000",
+      "promised_amount_in_staked": "0.000000000",
+      "extra_staked_in_promised": "0.000000000",
+      "all_time_extra_amount": "0.000000000",
+      "still_waiting_for_sui_amount": "0.000000000",
+      "price_calculated": 1,
+      "epoch": "5",
+      "waitedForEpoch": "6"
+    },
+    {
+      "immutable_pool_sui": "10000000000",
+      "immutable_pool_tokens": "10000000000",
+      "price_of_last_transaction": 1.0057907517435776,
+      "staked_sui_count": 3,
+      "staked_sui_activated_count": 2,
+      "staked_sui_pools_count": 2,
+      "token_total_supply": "120.928058559",
+      "pending_amount": "20.920000000",
+      "staked_amount": "96.935333717",
+      "staked_staked_suis": [
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "46935333717",
+          "stake_activation_epoch": "5"
+        },
+        {
+          "pool_id": "0xa6be4ba99d2d4f58c77e29df4a38cb6833d7f3c18dd349e38ae904ce48fb9e1e",
+          "principal": "25000000000",
+          "stake_activation_epoch": "6"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "25000000000",
+          "stake_activation_epoch": "7"
+        }
+      ],
+      "staked_with_rewards_balance": "97.476469233",
+      "all_time_promised_amount": "9.868146409",
+      "promised_amount": "6.768146409",
+      "promised_fulfilled": "0.000000000",
+      "promised_amount_in_staked": "3.100000000",
+      "extra_staked_in_promised": "0.000000000",
+      "all_time_extra_amount": "0.000000000",
+      "still_waiting_for_sui_amount": "0.000000000",
+      "price_calculated": 1.0057907509088004,
+      "epoch": "6",
+      "waitedForEpoch": "7"
+    },
+    {
+      "immutable_pool_sui": "10000000000",
+      "immutable_pool_tokens": "10000000000",
+      "price_of_last_transaction": 1.0126203748166926,
+      "staked_sui_count": 4,
+      "staked_sui_activated_count": 3,
+      "staked_sui_pools_count": 3,
+      "token_total_supply": "141.990653047",
+      "pending_amount": "20.900000000",
+      "staked_amount": "118.719478753",
+      "staked_staked_suis": [
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "43719478753",
+          "stake_activation_epoch": "5"
+        },
+        {
+          "pool_id": "0xa6be4ba99d2d4f58c77e29df4a38cb6833d7f3c18dd349e38ae904ce48fb9e1e",
+          "principal": "25000000000",
+          "stake_activation_epoch": "6"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "25000000000",
+          "stake_activation_epoch": "7"
+        },
+        {
+          "pool_id": "0xd0f9334f5556381f3b66710b51d955cf0820f2aeb8f6f352a5461ce994ff180f",
+          "principal": "25000000000",
+          "stake_activation_epoch": "8"
+        }
+      ],
+      "staked_with_rewards_balance": "120.012362297",
+      "all_time_promised_amount": "13.519734079",
+      "promised_amount": "7.129734079",
+      "promised_fulfilled": "0.000000000",
+      "promised_amount_in_staked": "6.390000000",
+      "extra_staked_in_promised": "0.000000000",
+      "all_time_extra_amount": "0.000000000",
+      "still_waiting_for_sui_amount": "0.000000000",
+      "price_calculated": 1.0126203741763682,
+      "epoch": "7",
+      "waitedForEpoch": "8"
+    },
+    {
+      "immutable_pool_sui": "10000000000",
+      "immutable_pool_tokens": "10000000000",
+      "price_of_last_transaction": 1.0201578508809541,
+      "staked_sui_count": 5,
+      "staked_sui_activated_count": 4,
+      "staked_sui_pools_count": 4,
+      "token_total_supply": "162.741469623",
+      "pending_amount": "20.880000000",
+      "staked_amount": "140.357586993",
+      "staked_staked_suis": [
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "40357586993",
+          "stake_activation_epoch": "5"
+        },
+        {
+          "pool_id": "0xa6be4ba99d2d4f58c77e29df4a38cb6833d7f3c18dd349e38ae904ce48fb9e1e",
+          "principal": "25000000000",
+          "stake_activation_epoch": "6"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "25000000000",
+          "stake_activation_epoch": "7"
+        },
+        {
+          "pool_id": "0xd0f9334f5556381f3b66710b51d955cf0820f2aeb8f6f352a5461ce994ff180f",
+          "principal": "25000000000",
+          "stake_activation_epoch": "8"
+        },
+        {
+          "pool_id": "0xa72195f77c3258b6cda9d781933e3ed8782c1bb17a9166203d50844d207c4716",
+          "principal": "25000000000",
+          "stake_activation_epoch": "9"
+        }
+      ],
+      "staked_with_rewards_balance": "142.604467051",
+      "all_time_promised_amount": "17.330625632",
+      "promised_amount": "7.462479223",
+      "promised_fulfilled": "0.000000000",
+      "promised_amount_in_staked": "9.868146409",
+      "extra_staked_in_promised": "0.000000000",
+      "all_time_extra_amount": "0.000000000",
+      "still_waiting_for_sui_amount": "0.000000000",
+      "price_calculated": 1.020157850439716,
+      "epoch": "8",
+      "waitedForEpoch": "9"
+    },
+    {
+      "immutable_pool_sui": "10000000000",
+      "immutable_pool_tokens": "10000000000",
+      "price_of_last_transaction": 1.0282054797828553,
+      "staked_sui_count": 6,
+      "staked_sui_activated_count": 5,
+      "staked_sui_pools_count": 4,
+      "token_total_supply": "205.946006160",
+      "pending_amount": "20.860000000",
+      "staked_amount": "187.866924284",
+      "staked_staked_suis": [
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "36866924284",
+          "stake_activation_epoch": "5"
+        },
+        {
+          "pool_id": "0xa6be4ba99d2d4f58c77e29df4a38cb6833d7f3c18dd349e38ae904ce48fb9e1e",
+          "principal": "25000000000",
+          "stake_activation_epoch": "6"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "25000000000",
+          "stake_activation_epoch": "7"
+        },
+        {
+          "pool_id": "0xd0f9334f5556381f3b66710b51d955cf0820f2aeb8f6f352a5461ce994ff180f",
+          "principal": "25000000000",
+          "stake_activation_epoch": "8"
+        },
+        {
+          "pool_id": "0xa72195f77c3258b6cda9d781933e3ed8782c1bb17a9166203d50844d207c4716",
+          "principal": "25000000000",
+          "stake_activation_epoch": "9"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "51000000000",
+          "stake_activation_epoch": "10"
+        }
+      ],
+      "staked_with_rewards_balance": "191.262562310",
+      "all_time_promised_amount": "23.887484407",
+      "promised_amount": "10.367750328",
+      "promised_fulfilled": "0.000000000",
+      "promised_amount_in_staked": "10.419734079",
+      "extra_staked_in_promised": "0.105952147",
+      "all_time_extra_amount": "0.105952147",
+      "still_waiting_for_sui_amount": "0.000000000",
+      "price_calculated": 1.028205479340479,
+      "epoch": "9",
+      "waitedForEpoch": "10"
+    },
+    {
+      "immutable_pool_sui": "10000000000",
+      "immutable_pool_tokens": "10000000000",
+      "price_of_last_transaction": 1.036207511015632,
+      "staked_sui_count": 7,
+      "staked_sui_activated_count": 6,
+      "staked_sui_pools_count": 4,
+      "token_total_supply": "223.833432164",
+      "pending_amount": "20.945952147",
+      "staked_amount": "209.263654518",
+      "staked_staked_suis": [
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "33263654518",
+          "stake_activation_epoch": "5"
+        },
+        {
+          "pool_id": "0xa6be4ba99d2d4f58c77e29df4a38cb6833d7f3c18dd349e38ae904ce48fb9e1e",
+          "principal": "25000000000",
+          "stake_activation_epoch": "6"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "25000000000",
+          "stake_activation_epoch": "7"
+        },
+        {
+          "pool_id": "0xd0f9334f5556381f3b66710b51d955cf0820f2aeb8f6f352a5461ce994ff180f",
+          "principal": "25000000000",
+          "stake_activation_epoch": "8"
+        },
+        {
+          "pool_id": "0xa72195f77c3258b6cda9d781933e3ed8782c1bb17a9166203d50844d207c4716",
+          "principal": "25000000000",
+          "stake_activation_epoch": "9"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "51000000000",
+          "stake_activation_epoch": "10"
+        },
+        {
+          "pool_id": "0xd0f9334f5556381f3b66710b51d955cf0820f2aeb8f6f352a5461ce994ff180f",
+          "principal": "25000000000",
+          "stake_activation_epoch": "11"
+        }
+      ],
+      "staked_with_rewards_balance": "213.996131713",
+      "all_time_promised_amount": "30.334825983",
+      "promised_amount": "13.004200351",
+      "promised_fulfilled": "0.000000000",
+      "promised_amount_in_staked": "10.940625632",
+      "extra_staked_in_promised": "0.111153760",
+      "all_time_extra_amount": "0.217105907",
+      "still_waiting_for_sui_amount": "0.000000000",
+      "price_calculated": 1.0362075104985298,
+      "epoch": "10",
+      "waitedForEpoch": "11"
+    },
+    {
+      "immutable_pool_sui": "10000000000",
+      "immutable_pool_tokens": "10000000000",
+      "price_of_last_transaction": 1.0449684087188365,
+      "staked_sui_count": 8,
+      "staked_sui_activated_count": 7,
+      "staked_sui_pools_count": 4,
+      "token_total_supply": "241.662131474",
+      "pending_amount": "20.037105907",
+      "staked_amount": "229.124187463",
+      "staked_staked_suis": [
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "27124187463",
+          "stake_activation_epoch": "5"
+        },
+        {
+          "pool_id": "0xa6be4ba99d2d4f58c77e29df4a38cb6833d7f3c18dd349e38ae904ce48fb9e1e",
+          "principal": "25000000000",
+          "stake_activation_epoch": "6"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "25000000000",
+          "stake_activation_epoch": "7"
+        },
+        {
+          "pool_id": "0xd0f9334f5556381f3b66710b51d955cf0820f2aeb8f6f352a5461ce994ff180f",
+          "principal": "25000000000",
+          "stake_activation_epoch": "8"
+        },
+        {
+          "pool_id": "0xa72195f77c3258b6cda9d781933e3ed8782c1bb17a9166203d50844d207c4716",
+          "principal": "25000000000",
+          "stake_activation_epoch": "9"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "51000000000",
+          "stake_activation_epoch": "10"
+        },
+        {
+          "pool_id": "0xd0f9334f5556381f3b66710b51d955cf0820f2aeb8f6f352a5461ce994ff180f",
+          "principal": "25000000000",
+          "stake_activation_epoch": "11"
+        },
+        {
+          "pool_id": "0xa72195f77c3258b6cda9d781933e3ed8782c1bb17a9166203d50844d207c4716",
+          "principal": "26000000000",
+          "stake_activation_epoch": "12"
+        }
+      ],
+      "staked_with_rewards_balance": "235.291428374",
+      "all_time_promised_amount": "36.686725866",
+      "promised_amount": "12.799241459",
+      "promised_fulfilled": "0.000000000",
+      "promised_amount_in_staked": "14.019337998",
+      "extra_staked_in_promised": "0.112303589",
+      "all_time_extra_amount": "0.329409496",
+      "still_waiting_for_sui_amount": "0.000000000",
+      "price_calculated": 1.0449684080899087,
+      "epoch": "11",
+      "waitedForEpoch": "12"
+    },
+    {
+      "immutable_pool_sui": "10000000000",
+      "immutable_pool_tokens": "10000000000",
+      "price_of_last_transaction": 1.0538273968290623,
+      "staked_sui_count": 9,
+      "staked_sui_activated_count": 8,
+      "staked_sui_pools_count": 4,
+      "token_total_supply": "259.422888402",
+      "pending_amount": "20.129409496",
+      "staked_amount": "248.145278918",
+      "staked_staked_suis": [
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "21145278918",
+          "stake_activation_epoch": "5"
+        },
+        {
+          "pool_id": "0xa6be4ba99d2d4f58c77e29df4a38cb6833d7f3c18dd349e38ae904ce48fb9e1e",
+          "principal": "25000000000",
+          "stake_activation_epoch": "6"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "25000000000",
+          "stake_activation_epoch": "7"
+        },
+        {
+          "pool_id": "0xd0f9334f5556381f3b66710b51d955cf0820f2aeb8f6f352a5461ce994ff180f",
+          "principal": "25000000000",
+          "stake_activation_epoch": "8"
+        },
+        {
+          "pool_id": "0xa72195f77c3258b6cda9d781933e3ed8782c1bb17a9166203d50844d207c4716",
+          "principal": "25000000000",
+          "stake_activation_epoch": "9"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "51000000000",
+          "stake_activation_epoch": "10"
+        },
+        {
+          "pool_id": "0xd0f9334f5556381f3b66710b51d955cf0820f2aeb8f6f352a5461ce994ff180f",
+          "principal": "25000000000",
+          "stake_activation_epoch": "11"
+        },
+        {
+          "pool_id": "0xa72195f77c3258b6cda9d781933e3ed8782c1bb17a9166203d50844d207c4716",
+          "principal": "26000000000",
+          "stake_activation_epoch": "12"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "25000000000",
+          "stake_activation_epoch": "13"
+        }
+      ],
+      "staked_with_rewards_balance": "255.874828413",
+      "all_time_promised_amount": "42.952116965",
+      "promised_amount": "12.617290982",
+      "promised_fulfilled": "0.000000000",
+      "promised_amount_in_staked": "16.815091904",
+      "extra_staked_in_promised": "0.112560022",
+      "all_time_extra_amount": "0.441969518",
+      "still_waiting_for_sui_amount": "0.000000000",
+      "price_calculated": 1.0538273959210622,
+      "epoch": "12",
+      "waitedForEpoch": "13"
+    },
+    {
+      "immutable_pool_sui": "10000000000",
+      "immutable_pool_tokens": "10000000000",
+      "price_of_last_transaction": 1.0538273968290623,
+      "staked_sui_count": 10,
+      "staked_sui_activated_count": 9,
+      "staked_sui_pools_count": 4,
+      "token_total_supply": "259.422888402",
+      "pending_amount": "0.241969518",
+      "staked_amount": "262.310932936",
+      "staked_staked_suis": [
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "15310932936",
+          "stake_activation_epoch": "5"
+        },
+        {
+          "pool_id": "0xa6be4ba99d2d4f58c77e29df4a38cb6833d7f3c18dd349e38ae904ce48fb9e1e",
+          "principal": "25000000000",
+          "stake_activation_epoch": "6"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "25000000000",
+          "stake_activation_epoch": "7"
+        },
+        {
+          "pool_id": "0xd0f9334f5556381f3b66710b51d955cf0820f2aeb8f6f352a5461ce994ff180f",
+          "principal": "25000000000",
+          "stake_activation_epoch": "8"
+        },
+        {
+          "pool_id": "0xa72195f77c3258b6cda9d781933e3ed8782c1bb17a9166203d50844d207c4716",
+          "principal": "25000000000",
+          "stake_activation_epoch": "9"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "51000000000",
+          "stake_activation_epoch": "10"
+        },
+        {
+          "pool_id": "0xd0f9334f5556381f3b66710b51d955cf0820f2aeb8f6f352a5461ce994ff180f",
+          "principal": "25000000000",
+          "stake_activation_epoch": "11"
+        },
+        {
+          "pool_id": "0xa72195f77c3258b6cda9d781933e3ed8782c1bb17a9166203d50844d207c4716",
+          "principal": "26000000000",
+          "stake_activation_epoch": "12"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "25000000000",
+          "stake_activation_epoch": "13"
+        },
+        {
+          "pool_id": "0xa72195f77c3258b6cda9d781933e3ed8782c1bb17a9166203d50844d207c4716",
+          "principal": "20000000000",
+          "stake_activation_epoch": "14"
+        }
+      ],
+      "staked_with_rewards_balance": "271.741130474",
+      "all_time_promised_amount": "42.952116965",
+      "promised_amount": "6.265391099",
+      "promised_fulfilled": "0.000000000",
+      "promised_amount_in_staked": "6.351899883",
+      "extra_staked_in_promised": "0.301191164",
+      "all_time_extra_amount": "0.743160682",
+      "still_waiting_for_sui_amount": "0.000000000",
+      "price_calculated": 1.062811807359687,
+      "epoch": "13",
+      "waitedForEpoch": "14"
+    },
+    {
+      "immutable_pool_sui": "10000000000",
+      "immutable_pool_tokens": "10000000000",
+      "price_of_last_transaction": 1.0538273968290623,
+      "staked_sui_count": 10,
+      "staked_sui_activated_count": 10,
+      "staked_sui_pools_count": 4,
+      "token_total_supply": "259.422888402",
+      "pending_amount": "0.543160682",
+      "staked_amount": "256.610285873",
+      "staked_staked_suis": [
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "9610285873",
+          "stake_activation_epoch": "5"
+        },
+        {
+          "pool_id": "0xa6be4ba99d2d4f58c77e29df4a38cb6833d7f3c18dd349e38ae904ce48fb9e1e",
+          "principal": "25000000000",
+          "stake_activation_epoch": "6"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "25000000000",
+          "stake_activation_epoch": "7"
+        },
+        {
+          "pool_id": "0xd0f9334f5556381f3b66710b51d955cf0820f2aeb8f6f352a5461ce994ff180f",
+          "principal": "25000000000",
+          "stake_activation_epoch": "8"
+        },
+        {
+          "pool_id": "0xa72195f77c3258b6cda9d781933e3ed8782c1bb17a9166203d50844d207c4716",
+          "principal": "25000000000",
+          "stake_activation_epoch": "9"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "51000000000",
+          "stake_activation_epoch": "10"
+        },
+        {
+          "pool_id": "0xd0f9334f5556381f3b66710b51d955cf0820f2aeb8f6f352a5461ce994ff180f",
+          "principal": "25000000000",
+          "stake_activation_epoch": "11"
+        },
+        {
+          "pool_id": "0xa72195f77c3258b6cda9d781933e3ed8782c1bb17a9166203d50844d207c4716",
+          "principal": "26000000000",
+          "stake_activation_epoch": "12"
+        },
+        {
+          "pool_id": "0xf765e440c7177b115e3fa431401039de48e922141e9916a620c399373fc317f9",
+          "principal": "25000000000",
+          "stake_activation_epoch": "13"
+        },
+        {
+          "pool_id": "0xa72195f77c3258b6cda9d781933e3ed8782c1bb17a9166203d50844d207c4716",
+          "principal": "20000000000",
+          "stake_activation_epoch": "14"
+        }
+      ],
+      "staked_with_rewards_balance": "267.870937874",
+      "all_time_promised_amount": "42.952116965",
+      "promised_amount": "0.000000000",
+      "promised_fulfilled": "0.000000000",
+      "promised_amount_in_staked": "12.617290982",
+      "extra_staked_in_promised": "0.000000000",
+      "all_time_extra_amount": "0.743160682",
+      "still_waiting_for_sui_amount": "0.000000000",
+      "price_calculated": 1.0732056075351815,
+      "epoch": "14",
+      "waitedForEpoch": "15"
+    }
+  ],
+  "transactions": [
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9990000000",
+      "promiseId": "",
+      "epoch": "3",
+      "time": 1693951893359,
+      "user": 2
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9990000000",
+      "promiseId": "",
+      "epoch": "3",
+      "time": 1693951893853,
+      "user": 3
+    },
+    {
+      "type": "deposit",
+      "send": "31.0",
+      "received": "31000000000",
+      "promiseId": "",
+      "epoch": "4",
+      "time": 1693951904051,
+      "user": 1
+    },
+    {
+      "type": "withdraw",
+      "send": "3100000000",
+      "received": "3100000000",
+      "promiseId": "0x0d6047d76fe1d32a571f3b337dc3186f9fb3adc6048fd90741d4cde26bf17ddc",
+      "epoch": "4",
+      "time": 1693951905205,
+      "user": 1
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9990000000",
+      "promiseId": "",
+      "epoch": "4",
+      "time": 1693951906710,
+      "user": 2
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9990000000",
+      "promiseId": "",
+      "epoch": "4",
+      "time": 1693951907737,
+      "user": 3
+    },
+    {
+      "type": "deposit",
+      "send": "5.0",
+      "received": "5000000000",
+      "promiseId": "",
+      "epoch": "5",
+      "time": 1693951916686,
+      "user": 1
+    },
+    {
+      "type": "withdraw",
+      "send": "3290000000",
+      "received": "3290000000",
+      "promiseId": "0x27a0319af86b9a0c27100f9bc02b6bb5362810e729fd887703e604837e130309",
+      "epoch": "5",
+      "time": 1693951917646,
+      "user": 1
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9990000000",
+      "promiseId": "",
+      "epoch": "5",
+      "time": 1693951919240,
+      "user": 2
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9990000000",
+      "promiseId": "",
+      "epoch": "5",
+      "time": 1693951920187,
+      "user": 3
+    },
+    {
+      "type": "deposit",
+      "send": "5.0",
+      "received": "4971212945",
+      "promiseId": "",
+      "epoch": "6",
+      "time": 1693951928836,
+      "user": 1
+    },
+    {
+      "type": "withdraw",
+      "send": "3458121294",
+      "received": "3478146409",
+      "promiseId": "0x6b73eb26ca12230ace8c630cf1219e6a7cbc6e7867d69e722369921dbd8222bb",
+      "epoch": "6",
+      "time": 1693951929646,
+      "user": 1
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9932483454",
+      "promiseId": "",
+      "epoch": "6",
+      "time": 1693951930676,
+      "user": 2
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9932483454",
+      "promiseId": "",
+      "epoch": "6",
+      "time": 1693951931788,
+      "user": 3
+    },
+    {
+      "type": "deposit",
+      "send": "5.0",
+      "received": "4937684570",
+      "promiseId": "",
+      "epoch": "7",
+      "time": 1693951938740,
+      "user": 1
+    },
+    {
+      "type": "withdraw",
+      "send": "3606077622",
+      "received": "3651587670",
+      "promiseId": "0x700f4b78df656c8810f8d857edbac3b294b132ef6a350aaffa9617b57b0409b0",
+      "epoch": "7",
+      "time": 1693951940257,
+      "user": 1
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9865493770",
+      "promiseId": "",
+      "epoch": "7",
+      "time": 1693951941291,
+      "user": 2
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9865493770",
+      "promiseId": "",
+      "epoch": "7",
+      "time": 1693951942767,
+      "user": 3
+    },
+    {
+      "type": "deposit",
+      "send": "5.0",
+      "received": "4901202295",
+      "promiseId": "",
+      "epoch": "8",
+      "time": 1693951950462,
+      "user": 1
+    },
+    {
+      "type": "withdraw",
+      "send": "3735590089",
+      "received": "3810891553",
+      "promiseId": "0x7e453576d17aaadae3e0ed934c889efef8840aead695f4ff4c2726a2d9615eb2",
+      "epoch": "8",
+      "time": 1693951951950,
+      "user": 1
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9792602185",
+      "promiseId": "",
+      "epoch": "8",
+      "time": 1693951953548,
+      "user": 2
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9792602185",
+      "promiseId": "",
+      "epoch": "8",
+      "time": 1693951954489,
+      "user": 3
+    },
+    {
+      "type": "deposit",
+      "send": "31.0",
+      "received": "30149615626",
+      "promiseId": "",
+      "epoch": "9",
+      "time": 1693951962964,
+      "user": 1
+    },
+    {
+      "type": "withdraw",
+      "send": "6376992643",
+      "received": "6556858775",
+      "promiseId": "0x6889cdaa5f9113e0712778e8ce0dc44b0b427ab631eefaa20b33d295e7bba34e",
+      "epoch": "9",
+      "time": 1693951963899,
+      "user": 1
+    },
+    {
+      "type": "fulfill",
+      "send": "",
+      "received": "3100000000",
+      "promiseId": "0x0d6047d76fe1d32a571f3b337dc3186f9fb3adc6048fd90741d4cde26bf17ddc",
+      "epoch": "9",
+      "time": 1693951965639,
+      "user": 1
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9715956777",
+      "promiseId": "",
+      "epoch": "9",
+      "time": 1693951967243,
+      "user": 2
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9715956777",
+      "promiseId": "",
+      "epoch": "9",
+      "time": 1693951968507,
+      "user": 3
+    },
+    {
+      "type": "deposit",
+      "send": "5.0",
+      "received": "4827630285",
+      "promiseId": "",
+      "epoch": "10",
+      "time": 1693951973652,
+      "user": 1
+    },
+    {
+      "type": "withdraw",
+      "send": "6222056407",
+      "received": "6447341576",
+      "promiseId": "0x4c8143be0017c50aede075421f1d0b44123aa5a121e2d18555f0982ef9c89ed2",
+      "epoch": "10",
+      "time": 1693951975279,
+      "user": 1
+    },
+    {
+      "type": "fulfill",
+      "send": "",
+      "received": "3290000000",
+      "promiseId": "0x27a0319af86b9a0c27100f9bc02b6bb5362810e729fd887703e604837e130309",
+      "epoch": "10",
+      "time": 1693951976333,
+      "user": 1
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9640926063",
+      "promiseId": "",
+      "epoch": "10",
+      "time": 1693951977300,
+      "user": 2
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9640926063",
+      "promiseId": "",
+      "epoch": "10",
+      "time": 1693951978382,
+      "user": 3
+    },
+    {
+      "type": "deposit",
+      "send": "5.0",
+      "received": "4787060925",
+      "promiseId": "",
+      "epoch": "11",
+      "time": 1693951984512,
+      "user": 1
+    },
+    {
+      "type": "withdraw",
+      "send": "6078556859",
+      "received": "6351899883",
+      "promiseId": "0xc6ecf2e7a32bef6fd152350a304389784adc824a46570034b06801d9fa16a096",
+      "epoch": "11",
+      "time": 1693951986008,
+      "user": 1
+    },
+    {
+      "type": "fulfill",
+      "send": "",
+      "received": "3478146409",
+      "promiseId": "0x6b73eb26ca12230ace8c630cf1219e6a7cbc6e7867d69e722369921dbd8222bb",
+      "epoch": "11",
+      "time": 1693951987024,
+      "user": 1
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9560097622",
+      "promiseId": "",
+      "epoch": "11",
+      "time": 1693951988550,
+      "user": 2
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9560097622",
+      "promiseId": "",
+      "epoch": "11",
+      "time": 1693951989048,
+      "user": 3
+    },
+    {
+      "type": "deposit",
+      "send": "5.0",
+      "received": "4746662845",
+      "promiseId": "",
+      "epoch": "12",
+      "time": 1693951995666,
+      "user": 1
+    },
+    {
+      "type": "withdraw",
+      "send": "5945367457",
+      "received": "6265391099",
+      "promiseId": "0xb91f14990e93b0f465b85bf0b543c9376d519c397fe2ed36e542a81061217df0",
+      "epoch": "12",
+      "time": 1693951996739,
+      "user": 1
+    },
+    {
+      "type": "fulfill",
+      "send": "",
+      "received": "3651587670",
+      "promiseId": "0x700f4b78df656c8810f8d857edbac3b294b132ef6a350aaffa9617b57b0409b0",
+      "epoch": "12",
+      "time": 1693951998254,
+      "user": 1
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9479730770",
+      "promiseId": "",
+      "epoch": "12",
+      "time": 1693951999268,
+      "user": 2
+    },
+    {
+      "type": "deposit",
+      "send": "9.99",
+      "received": "9479730770",
+      "promiseId": "",
+      "epoch": "12",
+      "time": 1693952000282,
+      "user": 3
+    },
+    {
+      "type": "fulfill",
+      "send": "",
+      "received": "3810891553",
+      "promiseId": "0x7e453576d17aaadae3e0ed934c889efef8840aead695f4ff4c2726a2d9615eb2",
+      "epoch": "13",
+      "time": 1693952007813,
+      "user": 1
+    },
+    {
+      "type": "fulfill",
+      "send": "",
+      "received": "6556858775",
+      "promiseId": "0x6889cdaa5f9113e0712778e8ce0dc44b0b427ab631eefaa20b33d295e7bba34e",
+      "epoch": "13",
+      "time": 1693952008911,
+      "user": 1
+    },
+    {
+      "type": "fulfill",
+      "send": "",
+      "received": "6447341576",
+      "promiseId": "0x4c8143be0017c50aede075421f1d0b44123aa5a121e2d18555f0982ef9c89ed2",
+      "epoch": "13",
+      "time": 1693952009885,
+      "user": 1
+    }
+  ]
+}

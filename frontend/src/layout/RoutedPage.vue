@@ -91,7 +91,7 @@ export default {
 		checkAccess: function() {
 			this.isComponentVisible = this.enoughAccessLevel();
 
-			this.contentViewEnabled = (!this.authRequired || this.$store.sessionUser.me);
+			this.contentViewEnabled = (!this.authRequired || (this.$store.sessionUser && this.$store.sessionUser.me) );
 
 			const title = (this.pageTitle ? ('' + this.pageTitle + ' @ ') : '') + this.title;
 			document.title = title;

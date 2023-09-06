@@ -28,15 +28,15 @@ const commands = {
 			command: 'node_modules/.bin/vue-cli-service',
 			args: ['serve', 'frontend/src/main.js', '--port', '8090'],
 		},
-		// {
-		// 	id: 'backend',
-		// 	cwd: path.join(__dirname, 'backend'),
-		// 	env: {
-		// 		PORT: "9999",
-		// 	},
-		// 	command: '../node_modules/.bin/nodemon',
-		// 	args: ['app.js'],
-		// },
+		{
+			id: 'backend',
+			cwd: path.join(__dirname, 'backend'),
+			env: {
+				PORT: "9999",
+			},
+			command: '../node_modules/.bin/nodemon',
+			args: ['app.js'],
+		},
 	],
 	build: [
 		// {

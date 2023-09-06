@@ -37,7 +37,7 @@ export default {
 	.q-chip {
 		margin-left: -6px;
 		background-color: transparent;
-		color: var(--on-brand-text-color);
+		color: var(--text-color);
 		text-transform: lowercase;
 	}
 	.body--dark .q-chip {

@@ -18,7 +18,7 @@
       bordered
       flat
     >
-      <q-card-section>
+      <q-card-section class="rewards_simulator">
         <div class="text-h6 text-center">Rewards simulator</div>
 
         <div class="q-pt-md">
@@ -97,13 +97,13 @@ export default {
         font-weight: bold;
     }
 
-    .q-field__native {
+    .rewards_simulator .q-field__native {
         text-align: right;
         color: var(--text-color) !important;
         font-weight: bold !important;
         font-size: 20px !important;
     }
-    .q-field__control .text-primary {
+    .rewards_simulator .q-field__control .text-primary {
         font-size: 16px;
     }
 

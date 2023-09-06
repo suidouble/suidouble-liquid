@@ -13,7 +13,7 @@ export default {
 			dark: false,
 			basePath: (process.env.BUILD_PREFIXED ? ('/'+process.env.BUILD_PREFIXED) : ''),
 			brand: {
-				title: 'Liquid.Double',
+				title: 'Double.Liquid',
 				// https://quasar.dev/style/theme-builder
 				// Also take a look at ./styles/vars.css
 				primary: '#4099ff',

@@ -1,5 +1,6 @@
 const { SuiMaster, TransactionBlock, MIST_PER_SUI } = require('suidouble');
 const path = require('path');
+const { stat } = require('fs');
 
 class LiquidDouble {
     constructor(params = {}) {
@@ -14,6 +15,10 @@ class LiquidDouble {
 
         this._debug = !!params.debug;
         this._epochStats = {};
+    }
+
+    get packageId() {
+        return this._packageId;
     }
 
     get coinType() {
@@ -138,6 +143,17 @@ class LiquidDouble {
         // console.log('epochInfo', BigInt(suiSystemStateInfo.epoch));
     }
 
+    /**
+     * Get the current getCurrentValidators from blockchain
+     * @returns BigInt
+     */
+    async getCurrentValidators() {
+        // @todo: check why .getCurrentEpoch() doesn't work
+        const suiSystemStateInfo = await this._suiMaster.provider.getLatestSuiSystemState();
+        return suiSystemStateInfo.activeValidators;
+        // console.log('epochInfo', BigInt(suiSystemStateInfo.epoch));
+    }
+
     async deposit(params = {}) {
         let amount = params.amount || null;
 
@@ -154,7 +170,20 @@ class LiquidDouble {
 
         const res = await this._mod.moveCall('deposit', [this._liquidStoreId, {type: 'SUI', amount: amount}, '0x0000000000000000000000000000000000000005']);
         if (res && res.status && res.status == 'success') {
-            return true;
+            res.ldAmountSend = amount;
+            res.ldType = 'deposit';
+            res.ldTime = new Date();
+
+            let amountReceived = 0;
+            for (const suiObject of res.created) {
+                if (suiObject.typeName == 'Coin') {
+                    amountReceived = suiObject.fields.balance;
+                }
+            }
+
+            res.ldAmountReceived = amountReceived;
+
+            return res;
         }
 
         return false;
@@ -189,11 +218,21 @@ class LiquidDouble {
             const liquidStoreWithdrawPromise = await this._suiMaster.objectStorage.findMostRecentByTypeName('LiquidStoreWithdrawPromise');
             if (liquidStoreWithdrawPromise) {
                 this.log('got a promise', liquidStoreWithdrawPromise.fields, liquidStoreWithdrawPromise.id);
-                return liquidStoreWithdrawPromise.id;
+
+                res.ldAmountSend = amount;
+                res.ldType = 'withdraw';
+                res.ldTime = new Date();
+                res.promiseId = liquidStoreWithdrawPromise.id;
+                res.fulfilled_at_epoch = liquidStoreWithdrawPromise.fields.fulfilled_at_epoch;
+                res.ldAmountReceived = liquidStoreWithdrawPromise.fields.sui_amount;
+
+                return res;
             }
 
-            return true;
+
+            return res;
         }
+
 
         return false;
     }
@@ -202,7 +241,7 @@ class LiquidDouble {
      * Tries to fulfill the oldest liquid pool promise current account has
      * @returns Boolean true on success, false if there's no ready promises
      */
-    async fulfill(promiseId = null) {
+    async fulfill(promiseId = null, tryN = 0) {
         let promiseIdToUse = promiseId;
 
         if (!promiseIdToUse) {
@@ -233,10 +272,36 @@ class LiquidDouble {
             const res = await this._mod.moveCall('fulfill', [this._liquidStoreId, promiseIdToUse, '0x0000000000000000000000000000000000000005']);
             if (res && res.status && res.status == 'success') {
                 this.log('promise fulfilled', promiseIdToUse);
-                return true;
-            } 
-        } catch (e) {
 
+                res.promiseId = promiseIdToUse;
+                res.ldType = 'fulfill';
+                res.ldTime = new Date();
+
+                let amountReceived = 0;
+                for (const suiObject of res.created) {
+                    if (suiObject.typeName == 'Coin') {
+                        amountReceived = suiObject.fields.balance;
+                    }
+                }
+    
+                res.ldAmountReceived = amountReceived;
+
+                return res;
+            } else {
+                // may get InsufficientGas as of wrong calculation. @todo: why?
+                if (tryN < 3) {
+                    return await this.fulfill(promiseIdToUse, tryN+1);
+                } else {
+                    console.log(res);
+                    console.log(res._data);
+                    console.log('promiseIdToUse', promiseIdToUse);
+    
+                    // await new Promise((res)=>setTimeout(res, 100000000));
+                    throw new Error('can not withdraw');
+                }
+            }
+        } catch (e) {
+            console.error(e);
         }
 
         this.log('promise NOT fulfilled', promiseIdToUse);
@@ -322,12 +387,15 @@ class LiquidDouble {
     }
 
     async getCurrentStatsAndWaitForTheNextEpoch(extraStatsObject = {}) {
+        const currentEpoch = await this.getCurrentEpoch();
         await new Promise((res)=>setTimeout(res, 500));
 
         const stats = await this.getCurrentStats(extraStatsObject);
-        const waitingForEpoch = stats.epoch + BigInt(1);
+        const waitingForEpoch = currentEpoch + BigInt(1);
 
         await this.waitForEpoch(waitingForEpoch);
+
+        stats.waitedForEpoch = waitingForEpoch;
 
         // this.log('waiting for epoch', waitingForEpoch);
         // let isItNextEpoch = false;
@@ -376,6 +444,7 @@ class LiquidDouble {
             token_total_supply: BigInt(0),
             pending_amount: BigInt(0),                     // pending SUI, not-staked yet
             staked_amount: BigInt(0),              // staked as StakedSui, not counting rewards
+            staked_staked_suis: [],
             staked_with_rewards_balance: BigInt(0), // calculated once per epoch amount of Sui in StakedSui + Rewards
             all_time_promised_amount: BigInt(0),    // all time amount of SUI asked to take out of pool
             promised_amount: BigInt(0),             // promised as withdraw, but not un-staked yet, not ready for pay-out
@@ -392,6 +461,8 @@ class LiquidDouble {
 
         const liquidStore = this._suiMaster.objectStorage.findMostRecentByTypeName('LiquidStore');
         await liquidStore.fetchFields(); // update fields to most recent
+
+
 
         ret.extra_staked_in_promised = BigInt(liquidStore.fields.promised_pool.fields.got_extra_staked);
         ret.all_time_extra_amount = BigInt(liquidStore.fields.promised_pool.fields.all_time_extra_amount);
@@ -442,6 +513,15 @@ class LiquidDouble {
                 ret.staked_sui_pools_count = pool_ids.length;
             });
         }
+        if (liquidStore.fields.staked_pool.fields.staked_pool.length) {
+            for (const item of liquidStore.fields.staked_pool.fields.staked_pool) {
+                ret.staked_staked_suis.push({
+                    pool_id: item.fields.pool_id,
+                    principal: item.fields.principal,
+                    stake_activation_epoch: item.fields.stake_activation_epoch,
+                });
+            }
+        }
 
         ret.token_total_supply = await this.amountToString(ret.token_total_supply);
         ret.pending_amount = await this.amountToString(ret.pending_amount);
@@ -456,11 +536,11 @@ class LiquidDouble {
 
         ret.promised_amount_in_staked = await this.amountToString(ret.promised_amount_in_staked);
 
-        ret.user_balance_sui = await this.getCurrentSUIBalance();
-        ret.user_balance_sui = await this.amountToString(ret.user_balance_sui);
+        // ret.user_balance_sui = await this.getCurrentSUIBalance();
+        // ret.user_balance_sui = await this.amountToString(ret.user_balance_sui);
 
-        ret.user_balance_tokens = await this.getCurrentTokenBalance();
-        ret.user_balance_tokens = await this.amountToString(ret.user_balance_tokens);
+        // ret.user_balance_tokens = await this.getCurrentTokenBalance();
+        // ret.user_balance_tokens = await this.amountToString(ret.user_balance_tokens);
 
         ret.still_waiting_for_sui_amount = await this.amountToString(ret.still_waiting_for_sui_amount);
 
@@ -500,6 +580,82 @@ class LiquidDouble {
         return 1;
     }
 
+    async fetchStatsStakedSuisHistory() {
+        let poolIds = {};
+        for (const key in this._epochStats) {
+            const stats = this._epochStats[key];
+
+            console.log(stats);
+            if (stats.staked_staked_suis && stats.staked_staked_suis.length) {
+                for (const staked_sui of stats.staked_staked_suis) {
+                    if (!poolIds[staked_sui.pool_id]) {
+                        poolIds[staked_sui.pool_id] = true;
+                    }
+                }
+            }
+        }
+
+        poolIds = Object.keys(poolIds);
+
+        console.log(poolIds);
+
+        // now lets get mappings of validator address -> poolIds
+        const poolIdToValidatorAddress = {};
+        const validatorAddressToStakingPoolId = {};
+
+        const validators = await this.getCurrentValidators();
+        console.log(validators);
+        for (const validator of validators) {
+            validatorAddressToStakingPoolId[validator.suiAddress] = validator.stakingPoolId;
+            poolIdToValidatorAddress[validator.stakingPoolId] = validator.suiAddress;
+        }
+
+        console.log('poolIdToValidatorAddress', poolIdToValidatorAddress);
+        console.log('validatorAddressToStakingPoolId', validatorAddressToStakingPoolId);
+
+        const poolsExchangeRates = {};
+
+        for (const poolId of poolIds) {
+            poolsExchangeRates[poolId] = [];
+        }
+
+        const paginatedResponse = await this._suiMaster.fetchEvents({
+            query: {"MoveEventType": "0x3::validator_set::ValidatorEpochInfoEventV2"}
+        });
+        await paginatedResponse.forEach((suiEvent)=>{
+            const json = suiEvent.parsedJson;
+            const eventPoolId = validatorAddressToStakingPoolId[json.validator_address];
+            const exchangeRate = json.pool_token_exchange_rate;
+            exchangeRate.epoch = parseInt(json.epoch);
+            exchangeRate.commission_rate = json.commission_rate;
+
+            console.log('eventPoolId', eventPoolId);
+            console.log('json', json);
+
+            if (poolsExchangeRates[eventPoolId]) {
+                poolsExchangeRates[eventPoolId].push(exchangeRate);
+            }
+        });
+
+        for (const poolId of poolIds) {
+            poolsExchangeRates[poolId].sort((a, b) => (a.epoch > b.epoch) ? 1 : -1);
+        }
+
+        return poolsExchangeRates;
+
+        // console.log(poolsExchangeRates); adsdas; 
+
+
+
+        // now lets fetch events for each validator
+
+    // await ld._suiMaster._provider.subscribeEvent({
+    //     filter: {"MoveEventType": "0x3::validator_set::ValidatorEpochInfoEventV2"},
+    //     // filter: {"TimeRange":{"startTime": '1669039504014', "endTime": '2669039604014'}},
+    //     onMessage: onMessage,
+    // });
+    }
+
     isStatsFull() {
         const data = Object.values(this._epochStats).sort((a, b) => (a.epoch > b.epoch) ? 1 : -1);
         if (data.length <= 1) {
@@ -516,7 +672,7 @@ class LiquidDouble {
 
     getCachedEpochStats(asCSV = false) {
         if (!asCSV) {
-            return this._epochStats;
+            return Object.values(this._epochStats).sort((a, b) => (a.epoch > b.epoch) ? 1 : -1);
         }
 
         const objectToCsv = (data)=>{

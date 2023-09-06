@@ -6,6 +6,7 @@ import { useColorStore } from './color.js';
 export default () => {
 	return {
 		color: useColorStore(),
+		// api: useApiStore(),
 		// sessionUser: useSessionUserStore(),
 		// settings: useSettingsStore(),
 	}
