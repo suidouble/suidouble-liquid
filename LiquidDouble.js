@@ -8,8 +8,12 @@ class LiquidDouble {
         this._liquidStoreId = params.liquidStoreId || null;
         this._as = params.as || 'admin';
 
-        this._suiMaster = null;
+        this._suiMaster = params.suiMaster || null;
         this._mod = null;
+
+        this._adminCapId = null;
+
+        this._liquidStatsId = params.liquidStatsId || null;
 
         this._isInitialized = false;
 
@@ -42,14 +46,16 @@ class LiquidDouble {
             return true;
         }
 
-        const suiMaster = new SuiMaster({provider: 'local', as: this._as, debug: this._debug});
-        await suiMaster.initialize();
-        await suiMaster.requestSuiFromFaucet();
+        if (!this._suiMaster) {
+            const suiMaster = new SuiMaster({provider: 'local', as: this._as, debug: this._debug});
+            await suiMaster.initialize();
+            await suiMaster.requestSuiFromFaucet();
+            this._suiMaster = suiMaster;
+        }        
 
-        this._suiMaster = suiMaster;
         // suiMaster.requestSuiFromFaucet();
 
-        const addedPackage = suiMaster.addPackage({
+        const addedPackage = this._suiMaster .addPackage({
             id: this._packageId,
             path: path.join(__dirname, 'move/'),
         });
@@ -59,12 +65,20 @@ class LiquidDouble {
 
         if (!this._packageId) {
             await addedPackage.publish();
-            liquidStore = await suiMaster.objectStorage.findMostRecentByTypeName('LiquidStore');
+            liquidStore = await this._suiMaster.objectStorage.findMostRecentByTypeName('LiquidStore');
 
             this._liquidStoreId = liquidStore.id;
             this._packageId = addedPackage._id;
 
+            const adminCap = await this._suiMaster.objectStorage.findMostRecentByTypeName('AdminCap');
+            this._adminCapId = adminCap.address;
+
+            const liquidStats = await this._suiMaster.objectStorage.findMostRecentByTypeName('SuidoubleLiquidStats');
+            this._liquidStatsId = liquidStats.address;
+
+
             hasToAttachTreasury = true;
+            await new Promise((res)=>setTimeout(res, 1000));
         }
 
         const mod = await addedPackage.getModule('suidouble_liquid');
@@ -73,15 +87,32 @@ class LiquidDouble {
         if (!this._liquidStoreId) {
             await this.findLiquidStore();
         }
+        if (!this._liquidStatsId) {
+            const statsMod = await addedPackage.getModule('suidouble_liquid_stats');
+
+            const eventsResponseStats = await statsMod.fetchEvents({eventTypeName: 'NewLiquidStatsEvent', order: 'descending'});
+            if (eventsResponseStats && eventsResponseStats.data && eventsResponseStats.data[0]) {
+                const suiEvent = eventsResponseStats.data[0];
+                this._liquidStatsId = suiEvent.parsedJson.id;
+            }
+        }
+
+        console.log('this._liquidStatsI', this._liquidStatsId);
+        console.log('this._liquidStatsI', this._liquidStatsId);
+        console.log('this._liquidStatsI', this._liquidStatsId);
+
 
         mod.pushObject(this._liquidStoreId); // LiquidStore created on publish
-        await suiMaster.objectStorage.fetchObjects();
-        liquidStore = await suiMaster.objectStorage.findMostRecentByTypeName('LiquidStore');
+        // mod.pushObject('0xd0410cb59376c8c4dd4e3e32d4a15f21a');
+        await this._suiMaster.objectStorage.fetchObjects();
+        liquidStore = await this._suiMaster.objectStorage.findMostRecentByTypeName('LiquidStore');
 
         if (!liquidStore) {
             throw new Error('can not initialize, can not find LiquidStore object');
         }
 
+
+        // if (hasToAttachTreasury || true) {
         if (hasToAttachTreasury) {
             await this.attachTreasury();
         }
@@ -106,11 +137,23 @@ class LiquidDouble {
             this._liquidStoreId = suiEvent.parsedJson.id;
 
             this.log('found. liquidStoreId is ', this._liquidStoreId);
-
-            return this._liquidStoreId;
+        } else {
+            this.log('no NewLiquidStoreEvent found');
         }
 
-        this.log('no NewLiquidStoreEvent found');
+        // this.log('looking for NewLiquidStatsEvent...');
+
+        // const eventsResponseStats = await this._mod.fetchEvents({eventTypeName: 'NewLiquidStatsEvent', order: 'descending'});
+        // console.log(eventsResponseStats.data);
+
+        // if (eventsResponseStats && eventsResponseStats.data && eventsResponseStats.data[0]) {
+        //     const suiEvent = eventsResponseStats.data[0];
+        //     this._liquidStatsId = suiEvent.parsedJson.id;
+
+        //     this.log('found. liquidStatsId is ', this._liquidStatsId);
+        // } else {
+        //     this.log('no NewLiquidStatsEvent found');
+        // }
 
         return null;
     }
@@ -125,7 +168,7 @@ class LiquidDouble {
 
         this.log('TreasuryCap found', treasury);
 
-        const res = await this._mod.moveCall('attach_treasury', [this._liquidStoreId, treasury.id, {type: 'SUI', amount: '10.0'}]);
+        const res = await this._mod.moveCall('attach_treasury', [this._liquidStoreId, treasury.id, {type: 'SUI', amount: '0.01'}]);
         if (res && res.status && res.status == 'success') {
             this.log('TreasuryCap attached.');
             return true;
@@ -168,7 +211,7 @@ class LiquidDouble {
             amount = BigInt(Math.floor(gonna));
         }
 
-        const res = await this._mod.moveCall('deposit', [this._liquidStoreId, {type: 'SUI', amount: amount}, '0x0000000000000000000000000000000000000005']);
+        const res = await this._mod.moveCall('deposit_v2', [this._liquidStoreId, {type: 'SUI', amount: amount}, this._liquidStatsId, '0x0000000000000000000000000000000000000005']);
         if (res && res.status && res.status == 'success') {
             res.ldAmountSend = amount;
             res.ldType = 'deposit';
@@ -208,10 +251,11 @@ class LiquidDouble {
         const moveParams = [
             this._liquidStoreId,
             {type: this.coinType, amount: amount},
+            this._liquidStatsId,
             '0x0000000000000000000000000000000000000005'
         ];
 
-        const res = await this._mod.moveCall('withdraw', moveParams);
+        const res = await this._mod.moveCall('withdraw_v2', moveParams);
         if (res && res.status && res.status == 'success') {
             // lets return the promise id
             this.log('got a promise');
@@ -237,6 +281,59 @@ class LiquidDouble {
         return false;
     }
 
+
+    async withdraw_fast(params = {}) {
+        let amount = params.amount || null;
+
+        if (!amount) {
+            amount = '10%';
+        }
+
+        if (amount.indexOf && amount.indexOf('%') !== -1) {
+            let currentBalance = await this.getCurrentTokenBalance();
+            amount = parseFloat(amount, 10);
+            let gonnaWithdraw = amount * (Number(currentBalance) / 100);
+            amount = BigInt(Math.floor(gonnaWithdraw));
+        }
+
+        this.log('going to withdraw_fast', amount);
+
+        const moveParams = [
+            this._liquidStoreId,
+            {type: this.coinType, amount: amount},
+            '0x0000000000000000000000000000000000000005'
+        ];
+
+        const res = await this._mod.moveCall('withdraw_fast', moveParams);
+        if (res && res.status && res.status == 'success') {
+            // lets return the promise id
+            this.log('withdraw_fast successful');
+            res.ldType = 'withdraw_fast';
+            res.ldAmountSend = amount;
+            res.ldTime = new Date();
+
+            let amountReceived = 0;
+            for (const suiObject of res.created) {
+                if (suiObject.typeName == 'Coin') {
+                    amountReceived = suiObject.fields.balance;
+                }
+            }
+
+            res.ldAmountReceived = amountReceived;
+
+            return res;
+        } else {
+            res.ldType = 'withdraw_fast';
+            res.ldType = new Date();
+            res.ldAmountSend = amount;
+            res.ldAmountReceived = 0;
+
+            return res;
+        }
+
+
+        return false;
+    }
     /**
      * Tries to fulfill the oldest liquid pool promise current account has
      * @returns Boolean true on success, false if there's no ready promises
@@ -269,7 +366,7 @@ class LiquidDouble {
         this.log('going to fulfill promise', promiseIdToUse);
 
         try {
-            const res = await this._mod.moveCall('fulfill', [this._liquidStoreId, promiseIdToUse, '0x0000000000000000000000000000000000000005']);
+            const res = await this._mod.moveCall('fulfill_v2', [this._liquidStoreId, promiseIdToUse, this._liquidStatsId, '0x0000000000000000000000000000000000000005']);
             if (res && res.status && res.status == 'success') {
                 this.log('promise fulfilled', promiseIdToUse);
 
@@ -310,14 +407,35 @@ class LiquidDouble {
 
     }
 
-    async once_per_epoch() {
+    async stake_pending_no_wait() {
         const txb = new TransactionBlock();
         // const ss = txb.moveCall({ target: `0x2::object::sui_system_state`, arguments: [] });
-        txb.moveCall({ target: ''+this._packageId+'::suidouble_liquid::once_per_epoch_if_needed', arguments:[
+        txb.moveCall({ target: ''+this._packageId+'::suidouble_liquid::stake_pending_no_wait_v2', arguments:[
             txb.pure(this._liquidStoreId),
+            txb.pure(this._adminCapId),
+            txb.object(this._liquidStatsId),
             txb.object('0x0000000000000000000000000000000000000005'), // SUI_SYSTEM_STATE_OBJECT_ID
         ]});
-        const res = await this._mod.moveCall('once_per_epoch_if_needed', {tx: txb});
+        const res = await this._mod.moveCall('stake_pending_no_wait', {tx: txb});
+        if (res && res.status && res.status == 'success') {
+            return true;
+        }
+
+        return false;
+
+    }
+
+    async once_per_epoch() {
+        const txb = new TransactionBlock();
+        this.log('this._liquidStatsId');
+        this.log(this._liquidStatsId);
+        // const ss = txb.moveCall({ target: `0x2::object::sui_system_state`, arguments: [] });
+        txb.moveCall({ target: ''+this._packageId+'::suidouble_liquid::once_per_epoch_if_needed_v2', arguments:[
+            txb.pure(this._liquidStoreId),
+            txb.object(this._liquidStatsId),
+            txb.object('0x0000000000000000000000000000000000000005'), // SUI_SYSTEM_STATE_OBJECT_ID
+        ]});
+        const res = await this._mod.moveCall('once_per_epoch_if_needed_v2', {tx: txb});
         if (res && res.status && res.status == 'success') {
             return true;
         }
@@ -386,12 +504,17 @@ class LiquidDouble {
         return ret;
     }
 
-    async getCurrentStatsAndWaitForTheNextEpoch(extraStatsObject = {}) {
+    async getCurrentStatsAndWaitForTheNextEpoch(extraStatsObject = {}, stake_pending_no_wait = false) {
         const currentEpoch = await this.getCurrentEpoch();
         await new Promise((res)=>setTimeout(res, 500));
 
+        if (stake_pending_no_wait) {
+            await this.stake_pending_no_wait();
+        }
+        
         const stats = await this.getCurrentStats(extraStatsObject);
         const waitingForEpoch = currentEpoch + BigInt(1);
+
 
         await this.waitForEpoch(waitingForEpoch);
 
@@ -455,7 +578,12 @@ class LiquidDouble {
             all_time_extra_amount: BigInt(0),
 
             still_waiting_for_sui_amount: BigInt(0),
+
+            fee_amount: BigInt(0),
+            fee_pool_token: BigInt(0),
         };
+
+        await this.calc_expected_profits();
 
         ret.price_of_last_transaction = await this.getCurrentPrice();
 
@@ -476,6 +604,9 @@ class LiquidDouble {
         ret.token_total_supply = BigInt(liquidStore.fields.treasury.fields.total_supply.fields.value);
 
         ret.pending_amount = BigInt(liquidStore.fields.pending_pool);
+        ret.fee_amount = BigInt(liquidStore.fields.fee_pool);
+
+        ret.fee_pool_token = BigInt(liquidStore.fields.fee_pool_token);
 
         ret.staked_amount = BigInt(liquidStore.fields.staked_pool.fields.staked_amount);
 
@@ -528,6 +659,10 @@ class LiquidDouble {
         ret.staked_amount = await this.amountToString(ret.staked_amount);
         ret.staked_with_rewards_balance = await this.amountToString(ret.staked_with_rewards_balance);
         ret.promised_amount = await this.amountToString(ret.promised_amount);
+        ret.fee_amount = await this.amountToString(ret.fee_amount);
+        ret.fee_pool_token = await this.amountToString(ret.fee_pool_token);
+
+
         ret.all_time_promised_amount = await this.amountToString(ret.all_time_promised_amount);
         ret.promised_fulfilled = await this.amountToString(ret.promised_fulfilled);
 
