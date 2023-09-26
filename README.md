@@ -4,7 +4,7 @@ Sui Liquid Staking Hackathon Entry
 
 Move package source code, intergration tests and local node simulation interface
 
-Take a look at  [hackpaper](https://suidouble.github.io/dl/doubleliquid_hackpaper_v0.93.pdf) for a quick introduction. 
+Take a look at  [hackpaper](https://suidouble.github.io/dl/doubleliquid_hackpaper_v0.93.pdf) or [demo video](https://www.youtube.com/watch?v=a4WDbK9iCa0) for a quick introduction. 
 
 Dapp is online, source code is here: [on github](https://github.com/suidouble/doubleliquid-dapp)
 
